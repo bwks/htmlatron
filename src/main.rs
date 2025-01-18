@@ -22,6 +22,7 @@ enum Tags {
     Footer,
     Body,
     Meta,
+    Title,
     Div,
     H1,
     H2,
@@ -38,6 +39,7 @@ impl Display for Tags {
             Tags::Footer => write!(f, "footer"),
             Tags::Body => write!(f, "body"),
             Tags::Meta => write!(f, "meta"),
+            Tags::Title => write!(f, "title"),
             Tags::Div => write!(f, "div"),
             Tags::H1 => write!(f, "h1"),
             Tags::H2 => write!(f, "h2"),
@@ -199,6 +201,34 @@ impl Display for Tag {
     }
 }
 
+// Macro version of generating Tag methods
+// macro_rules! create_tag_fn {
+//     ($($name:ident => $tag:expr),*) => {
+//         $(
+//             fn $name() -> TagBuilder {
+//                 TagBuilder::new($tag)
+//             }
+//         )*
+//     }
+// }
+
+// impl Tag {
+//     create_tag_fn! {
+//         doctype => Tags::Doctype,
+//         comment => Tags::Comment,
+//         html => Tags::Html,
+//         header => Tags::Header,
+//         footer => Tags::Footer,
+//         body => Tags::Body,
+//         div => Tags::Div,
+//         h1 => Tags::H1,
+//         p => Tags::P,
+//         meta => Tags::Meta,
+//         title => Tags::Title
+//     }
+// }
+//
+
 impl Tag {
     fn doctype() -> TagBuilder {
         TagBuilder::new(Tags::Doctype)
@@ -229,6 +259,9 @@ impl Tag {
     }
     fn meta() -> TagBuilder {
         TagBuilder::new(Tags::Meta)
+    }
+    fn title() -> TagBuilder {
+        TagBuilder::new(Tags::Title)
     }
 }
 
@@ -292,12 +325,17 @@ fn main() {
     let meta = Tag::meta()
         .charset(Charset(vec!["utf-8".to_string()]))
         .build();
+    let title = Tag::title().content("The is the title".to_string()).build();
     let comment = Tag::comment().text("this is a comment".to_string()).build();
 
     let doctype = Tag::doctype().build();
     let html = Tag::html().lang(lang);
 
-    let header = Tag::header().id(Id(vec!["header".to_string()])).build();
+    let header = Tag::header()
+        .id(Id(vec!["header".to_string()]))
+        .children(vec![meta, title])
+        .build();
+
     let footer = Tag::footer().id(Id(vec!["footer".to_string()])).build();
 
     let content = Tag::div()
@@ -325,7 +363,7 @@ fn main() {
         tags: vec![
             doctype,
             comment,
-            html.children(vec![meta, header, body, footer]).build(),
+            html.children(vec![header, body, footer]).build(),
         ],
     };
 
