@@ -294,6 +294,9 @@ fn main() {
         .build();
     let comment = Tag::comment().text("this is a comment".to_string()).build();
 
+    let doctype = Tag::doctype().build();
+    let html = Tag::html().lang(lang);
+
     let header = Tag::header().id(Id(vec!["header".to_string()])).build();
     let footer = Tag::footer().id(Id(vec!["footer".to_string()])).build();
 
@@ -313,22 +316,16 @@ fn main() {
         ])
         .build();
 
+    let body = Tag::body()
+        .class(Class(vec!["body".to_string()]))
+        .children(vec![content])
+        .build();
+
     let document = Document {
         tags: vec![
-            Tag::doctype().build(),
+            doctype,
             comment,
-            Tag::html()
-                .lang(lang)
-                .children(vec![
-                    meta,
-                    header,
-                    Tag::body()
-                        .class(Class(vec!["body".to_string()]))
-                        .children(vec![content])
-                        .build(),
-                    footer,
-                ])
-                .build(),
+            html.children(vec![meta, header, body, footer]).build(),
         ],
     };
 
