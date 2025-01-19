@@ -29,6 +29,7 @@ enum Tags {
     H3,
     P,
     Br,
+    Img,
 }
 impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -47,13 +48,14 @@ impl Display for Tags {
             Tags::H3 => write!(f, "h3"),
             Tags::P => write!(f, "p"),
             Tags::Br => write!(f, "br"),
+            Tags::Img => write!(f, "img"),
         }
     }
 }
 impl Tags {
     fn close_tag(&self) -> String {
         match self {
-            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br => "".to_string(),
+            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br | Tags::Img => "".to_string(),
             _ => format!("</{}>", self),
         }
     }
@@ -66,6 +68,8 @@ struct TagBuilder {
     class: Option<Class>,
     lang: Option<Lang>,
     charset: Option<Charset>,
+    src: Option<Src>,
+    alt: Option<Alt>,
     text: Option<String>,
     content: Option<String>,
     children: Option<Vec<Tag>>,
@@ -79,6 +83,8 @@ impl TagBuilder {
             class: None,
             lang: None,
             charset: None,
+            src: None,
+            alt: None,
             text: None,
             content: None,
             children: None,
@@ -105,6 +111,16 @@ impl TagBuilder {
         self
     }
 
+    fn src(mut self, src: Src) -> Self {
+        self.src = Some(src);
+        self
+    }
+
+    fn alt(mut self, alt: Alt) -> Self {
+        self.alt = Some(alt);
+        self
+    }
+
     fn text(mut self, text: String) -> Self {
         self.text = Some(text);
         self
@@ -127,6 +143,8 @@ impl TagBuilder {
             class: self.class,
             lang: self.lang,
             charset: self.charset,
+            src: self.src,
+            alt: self.alt,
             text: self.text,
             content: self.content,
             children: self.children,
@@ -142,6 +160,8 @@ struct Tag {
     class: Option<Class>,
     lang: Option<Lang>,
     charset: Option<Charset>,
+    src: Option<Src>,
+    alt: Option<Alt>,
     text: Option<String>,
     content: Option<String>,
     children: Option<Vec<Tag>>,
@@ -177,15 +197,20 @@ impl Display for Tag {
             open_tag.push_str(" ");
             open_tag.push_str(&self.charset.as_ref().unwrap().to_string());
         }
+        if self.src.is_some() {
+            open_tag.push_str(" ");
+            open_tag.push_str(&self.src.as_ref().unwrap().to_string());
+        }
+        if self.alt.is_some() {
+            open_tag.push_str(" ");
+            open_tag.push_str(&self.alt.as_ref().unwrap().to_string());
+        }
         if self.text.is_some() {
             open_tag.push_str(" ");
             open_tag.push_str(&self.text.as_ref().unwrap());
         }
 
         // Tag logic
-        if self.tag == Tags::Doctype {
-            open_tag.push_str(" html");
-        }
         if self.tag == Tags::Comment {
             open_tag.push_str(" --");
         }
@@ -194,11 +219,10 @@ impl Display for Tag {
 
         write!(
             f,
-            r#"<{}>
-{}{}
-{}
-"#,
-            open_tag, content, children, close_tag,
+            r#"<{open_tag}>
+  {content}{children}
+{close_tag}
+"#
         )
     }
 }
@@ -268,6 +292,9 @@ impl Tag {
     fn br() -> TagBuilder {
         TagBuilder::new(Tags::Br)
     }
+    fn img() -> TagBuilder {
+        TagBuilder::new(Tags::Img)
+    }
 }
 
 #[derive(Debug, Clone)]
@@ -321,6 +348,32 @@ impl Display for Charset {
     }
 }
 
+#[derive(Debug, Clone)]
+struct Src(String);
+
+impl Display for Src {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Src(value) => {
+                write!(f, r#"src="{}""#, value)
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Alt(String);
+
+impl Display for Alt {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Alt(value) => {
+                write!(f, r#"alt="{}""#, value)
+            }
+        }
+    }
+}
+
 fn main() {
     let id1 = Id(vec!["one".to_string(), "two".to_string()]);
     let id2 = Id(vec!["five".to_string(), "six".to_string()]);
@@ -333,8 +386,13 @@ fn main() {
     let title = Tag::title().content("The is the title".to_string()).build();
     let comment = Tag::comment().text("this is a comment".to_string()).build();
 
-    let doctype = Tag::doctype().build();
+    let doctype = Tag::doctype().text("html".to_string()).build();
     let html = Tag::html().lang(lang);
+
+    let image = Tag::img()
+        .src(Src("blah.img".to_string()))
+        .alt(Alt("some image".to_string()))
+        .build();
 
     let header = Tag::header()
         .id(Id(vec!["header".to_string()]))
@@ -350,6 +408,7 @@ fn main() {
         .class(class1.clone())
         .children(vec![
             //
+            image,
             Tag::div()
                 .id(id2.clone())
                 .class(class2.clone())
