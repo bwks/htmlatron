@@ -13,7 +13,7 @@ impl Display for Document {
     }
 }
 
-#[derive(Debug, PartialEq)]
+#[derive(Debug, Clone, PartialEq)]
 enum Tags {
     Doctype,
     Comment,
@@ -28,6 +28,7 @@ enum Tags {
     H2,
     H3,
     P,
+    Br,
 }
 impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -45,13 +46,14 @@ impl Display for Tags {
             Tags::H2 => write!(f, "h2"),
             Tags::H3 => write!(f, "h3"),
             Tags::P => write!(f, "p"),
+            Tags::Br => write!(f, "br"),
         }
     }
 }
 impl Tags {
     fn close_tag(&self) -> String {
         match self {
-            Tags::Doctype | Tags::Meta | Tags::Comment => "".to_string(),
+            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br => "".to_string(),
             _ => format!("</{}>", self),
         }
     }
@@ -133,7 +135,7 @@ impl TagBuilder {
 }
 
 // blah
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 struct Tag {
     tag: Tags,
     id: Option<Id>,
@@ -192,10 +194,10 @@ impl Display for Tag {
 
         write!(
             f,
-            r#"
-    <{}>
-      {}{}
-    {}"#,
+            r#"<{}>
+{}{}
+{}
+"#,
             open_tag, content, children, close_tag,
         )
     }
@@ -262,6 +264,9 @@ impl Tag {
     }
     fn title() -> TagBuilder {
         TagBuilder::new(Tags::Title)
+    }
+    fn br() -> TagBuilder {
+        TagBuilder::new(Tags::Br)
     }
 }
 
@@ -338,6 +343,8 @@ fn main() {
 
     let footer = Tag::footer().id(Id(vec!["footer".to_string()])).build();
 
+    let line_break = Tag::br().build();
+
     let content = Tag::div()
         .id(id1.clone())
         .class(class1.clone())
@@ -363,7 +370,15 @@ fn main() {
         tags: vec![
             doctype,
             comment,
-            html.children(vec![header, body, footer]).build(),
+            html.children(vec![
+                header,
+                body,
+                footer,
+                line_break.clone(),
+                line_break.clone(),
+                line_break.clone(),
+            ])
+            .build(),
         ],
     };
 
