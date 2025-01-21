@@ -30,6 +30,7 @@ enum Tags {
     P,
     Br,
     Img,
+    A,
 }
 impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -49,6 +50,7 @@ impl Display for Tags {
             Tags::P => write!(f, "p"),
             Tags::Br => write!(f, "br"),
             Tags::Img => write!(f, "img"),
+            Tags::A => write!(f, "a"),
         }
     }
 }
@@ -70,8 +72,9 @@ struct TagBuilder {
     charset: Option<Charset>,
     src: Option<Src>,
     alt: Option<Alt>,
-    text: Option<String>,
-    content: Option<String>,
+    href: Option<Href>,
+    text: Option<&'static str>,
+    content: Option<&'static str>,
     children: Option<Vec<Tag>>,
 }
 
@@ -85,12 +88,14 @@ impl TagBuilder {
             charset: None,
             src: None,
             alt: None,
+            href: None,
             text: None,
             content: None,
             children: None,
         }
     }
 
+    // region:    ===== Global Attributes ===== //
     fn id(mut self, id: Id) -> Self {
         self.id = Some(id);
         self
@@ -105,12 +110,15 @@ impl TagBuilder {
         self.lang = Some(lang);
         self
     }
+    // endregion: ===== Global Attributes ===== //
 
+    // meta
     fn charset(mut self, charset: Charset) -> Self {
         self.charset = Some(charset);
         self
     }
 
+    // region:    ===== img tag attributes ===== //
     fn src(mut self, src: Src) -> Self {
         self.src = Some(src);
         self
@@ -120,17 +128,31 @@ impl TagBuilder {
         self.alt = Some(alt);
         self
     }
+    // endregion: ===== img tag attributes ===== //
 
-    fn text(mut self, text: String) -> Self {
+    // region:    ===== a tag attributes ===== //
+    fn href(mut self, href: Href) -> Self {
+        self.href = Some(href);
+        self
+    }
+
+    // target
+
+    // endregion: ===== a tag attributes ===== //
+
+    // Text within a tag
+    fn text(mut self, text: &'static str) -> Self {
         self.text = Some(text);
         self
     }
 
-    fn content(mut self, content: String) -> Self {
+    // Content within a opening and closing tags
+    fn content(mut self, content: &'static str) -> Self {
         self.content = Some(content);
         self
     }
 
+    // Nested tags
     fn children(mut self, children: Vec<Tag>) -> Self {
         self.children = Some(children);
         self
@@ -145,6 +167,7 @@ impl TagBuilder {
             charset: self.charset,
             src: self.src,
             alt: self.alt,
+            href: self.href,
             text: self.text,
             content: self.content,
             children: self.children,
@@ -162,8 +185,9 @@ struct Tag {
     charset: Option<Charset>,
     src: Option<Src>,
     alt: Option<Alt>,
-    text: Option<String>,
-    content: Option<String>,
+    href: Option<Href>,
+    text: Option<&'static str>,
+    content: Option<&'static str>,
     children: Option<Vec<Tag>>,
 }
 impl Display for Tag {
@@ -204,6 +228,10 @@ impl Display for Tag {
         if self.alt.is_some() {
             open_tag.push_str(" ");
             open_tag.push_str(&self.alt.as_ref().unwrap().to_string());
+        }
+        if self.href.is_some() {
+            open_tag.push_str(" ");
+            open_tag.push_str(&self.href.as_ref().unwrap().to_string());
         }
         if self.text.is_some() {
             open_tag.push_str(" ");
@@ -295,22 +323,25 @@ impl Tag {
     fn img() -> TagBuilder {
         TagBuilder::new(Tags::Img)
     }
+    fn a() -> TagBuilder {
+        TagBuilder::new(Tags::A)
+    }
 }
 
 #[derive(Debug, Clone)]
-struct Id(Vec<String>);
+struct Id(&'static str);
 
 impl Display for Id {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Id(values) => {
-                write!(f, r#"id="{}""#, values.join(" "))
+            Id(value) => {
+                write!(f, r#"id="{value}""#)
             }
         }
     }
 }
 #[derive(Debug, Clone)]
-struct Class(Vec<String>);
+struct Class(Vec<&'static str>);
 
 impl Display for Class {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -323,33 +354,33 @@ impl Display for Class {
 }
 
 #[derive(Debug, Clone)]
-struct Lang(Vec<String>);
+struct Lang(&'static str);
 
 impl Display for Lang {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Lang(values) => {
-                write!(f, r#"lang="{}""#, values.join(" "))
+            Lang(value) => {
+                write!(f, r#"lang="{value}""#)
             }
         }
     }
 }
 
 #[derive(Debug, Clone)]
-struct Charset(Vec<String>);
+struct Charset(&'static str);
 
 impl Display for Charset {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Charset(values) => {
-                write!(f, r#"charset="{}""#, values.join(" "))
+            Charset(value) => {
+                write!(f, r#"charset="{value}""#)
             }
         }
     }
 }
 
 #[derive(Debug, Clone)]
-struct Src(String);
+struct Src(&'static str);
 
 impl Display for Src {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -362,7 +393,7 @@ impl Display for Src {
 }
 
 #[derive(Debug, Clone)]
-struct Alt(String);
+struct Alt(&'static str);
 
 impl Display for Alt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -374,32 +405,43 @@ impl Display for Alt {
     }
 }
 
-fn main() {
-    let id1 = Id(vec!["one".to_string(), "two".to_string()]);
-    let id2 = Id(vec!["five".to_string(), "six".to_string()]);
-    let class1 = Class(vec!["three".to_string(), "four".to_string()]);
-    let class2 = Class(vec!["seven".to_string(), "eight".to_string()]);
-    let lang = Lang(vec!["en".to_string()]);
-    let meta = Tag::meta()
-        .charset(Charset(vec!["utf-8".to_string()]))
-        .build();
-    let title = Tag::title().content("The is the title".to_string()).build();
-    let comment = Tag::comment().text("this is a comment".to_string()).build();
+#[derive(Debug, Clone)]
+struct Href(&'static str);
 
-    let doctype = Tag::doctype().text("html".to_string()).build();
+impl Display for Href {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Href(value) => {
+                write!(f, r#"href="{}""#, value)
+            }
+        }
+    }
+}
+
+fn main() {
+    let id1 = Id("one");
+    let id2 = Id("two");
+    let class1 = Class(vec!["three", "four"]);
+    let class2 = Class(vec!["seven", "eight"]);
+    let lang = Lang("en");
+    let meta = Tag::meta().charset(Charset("utf-8")).build();
+    let title = Tag::title().content("The is the title").build();
+    let comment = Tag::comment().text("this is a comment").build();
+
+    let doctype = Tag::doctype().text("html").build();
     let html = Tag::html().lang(lang);
 
     let image = Tag::img()
-        .src(Src("blah.img".to_string()))
-        .alt(Alt("some image".to_string()))
+        .src(Src("blah.img"))
+        .alt(Alt("some image"))
         .build();
 
     let header = Tag::header()
-        .id(Id(vec!["header".to_string()]))
+        .id(Id("header"))
         .children(vec![meta, title])
         .build();
 
-    let footer = Tag::footer().id(Id(vec!["footer".to_string()])).build();
+    let footer = Tag::footer().id(Id("footer")).build();
 
     let line_break = Tag::br().build();
 
@@ -413,15 +455,16 @@ fn main() {
                 .id(id2.clone())
                 .class(class2.clone())
                 .children(vec![
-                    Tag::h1().content("Heading".to_owned()).build(),
-                    Tag::p().content("blah blah blah".to_owned()).build(),
+                    Tag::h1().content("Heading").build(),
+                    Tag::p().content("blah blah blah").build(),
+                    Tag::a().href(Href("http://stuff.things")).build(),
                 ])
                 .build(),
         ])
         .build();
 
     let body = Tag::body()
-        .class(Class(vec!["body".to_string()]))
+        .class(Class(vec!["body"]))
         .children(vec![content])
         .build();
 
