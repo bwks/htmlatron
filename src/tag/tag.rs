@@ -1,0 +1,59 @@
+use std::fmt::Display;
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum Tags {
+    A,
+    Body,
+    Br,
+    Comment,
+    Div,
+    Doctype,
+    Footer,
+    H1,
+    H2,
+    H3,
+    H4,
+    H5,
+    H6,
+    Header,
+    Html,
+    Img,
+    Li,
+    Link,
+    Meta,
+    Ol,
+    P,
+    Script,
+    Title,
+    Ul,
+}
+impl Display for Tags {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Tags::A => write!(f, "a"),
+            Tags::Body => write!(f, "body"),
+            Tags::Br => write!(f, "br"),
+            Tags::Comment => write!(f, "!--"),
+            Tags::Div => write!(f, "div"),
+            Tags::Doctype => write!(f, "!DOCTYPE"),
+            Tags::Footer => write!(f, "footer"),
+            Tags::H1 => write!(f, "h1"),
+            Tags::H2 => write!(f, "h2"),
+            Tags::H3 => write!(f, "h3"),
+            Tags::H4 => write!(f, "h4"),
+            Tags::H5 => write!(f, "h5"),
+            Tags::H6 => write!(f, "h6"),
+            Tags::Header => write!(f, "header"),
+            Tags::Html => write!(f, "html"),
+            Tags::Img => write!(f, "img"),
+            Tags::Li => write!(f, "li"),
+            Tags::Link => write!(f, "link"),
+            Tags::Meta => write!(f, "meta"),
+            Tags::Ol => write!(f, "ol"),
+            Tags::P => write!(f, "p"),
+            Tags::Script => write!(f, "script"),
+            Tags::Title => write!(f, "title"),
+            Tags::Ul => write!(f, "ul"),
+        }
+    }
+}
