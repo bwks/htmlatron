@@ -88,19 +88,19 @@ impl Attrs {
     }
 }
 
-struct AttrsBuilder {
-    id: Option<Id>,
-    class: Option<Class>,
-    lang: Option<Lang>,
-    charset: Option<Charset>,
-    src: Option<Src>,
-    alt: Option<Alt>,
-    href: Option<Href>,
-    rel: Option<Rel>,
+pub struct AttrsBuilder {
+    pub id: Option<Id>,
+    pub class: Option<Class>,
+    pub lang: Option<Lang>,
+    pub charset: Option<Charset>,
+    pub src: Option<Src>,
+    pub alt: Option<Alt>,
+    pub href: Option<Href>,
+    pub rel: Option<Rel>,
 }
 
 impl AttrsBuilder {
-    fn new() -> Self {
+    pub fn new() -> Self {
         AttrsBuilder {
             id: None,
             class: None,
@@ -114,51 +114,51 @@ impl AttrsBuilder {
     }
 
     // region:    ===== Global Attributes ===== //
-    fn id(mut self, id: &'static str) -> Self {
+    pub fn id(mut self, id: &'static str) -> Self {
         self.id = Some(Id(id));
         self
     }
 
-    fn class(mut self, class: Vec<&'static str>) -> Self {
+    pub fn class(mut self, class: Vec<&'static str>) -> Self {
         self.class = Some(Class(class));
         self
     }
 
-    fn lang(mut self, lang: &'static str) -> Self {
+    pub fn lang(mut self, lang: &'static str) -> Self {
         self.lang = Some(Lang(lang));
         self
     }
     // endregion: ===== Global Attributes ===== //
 
     // meta
-    fn charset(mut self, charset: &'static str) -> Self {
+    pub fn charset(mut self, charset: &'static str) -> Self {
         self.charset = Some(Charset(charset));
         self
     }
 
     // region:    ===== img tag attributes ===== //
-    fn src(mut self, src: &'static str) -> Self {
+    pub fn src(mut self, src: &'static str) -> Self {
         self.src = Some(Src(src));
         self
     }
 
-    fn alt(mut self, alt: &'static str) -> Self {
+    pub fn alt(mut self, alt: &'static str) -> Self {
         self.alt = Some(Alt(alt));
         self
     }
     // endregion: ===== img tag attributes ===== //
 
-    fn href(mut self, href: &'static str) -> Self {
+    pub fn href(mut self, href: &'static str) -> Self {
         self.href = Some(Href(href));
         self
     }
 
-    fn rel(mut self, rel: &'static str) -> Self {
+    pub fn rel(mut self, rel: &'static str) -> Self {
         self.rel = Some(Rel(rel));
         self
     }
 
-    fn build(self) -> Attrs {
+    pub fn build(self) -> Attrs {
         Attrs {
             id: self.id,
             class: self.class,

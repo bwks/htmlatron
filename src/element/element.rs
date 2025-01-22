@@ -24,7 +24,7 @@ impl ElementBuilder {
     }
 
     // region:    ===== Global Attributes ===== //
-    fn attrs(mut self, attrs: Attrs) -> Self {
+    pub fn attrs(mut self, attrs: Attrs) -> Self {
         self.attrs = Some(attrs);
         self
     }
@@ -33,24 +33,24 @@ impl ElementBuilder {
     // endregion: ===== a tag attributes ===== //
 
     // Text within a tag
-    fn text(mut self, text: &'static str) -> Self {
+    pub fn text(mut self, text: &'static str) -> Self {
         self.text = Some(text);
         self
     }
 
     // Content within a opening and closing tags
-    fn content(mut self, content: &'static str) -> Self {
+    pub fn content(mut self, content: &'static str) -> Self {
         self.content = Some(content);
         self
     }
 
     // Nested tags
-    fn children(mut self, children: Vec<Element>) -> Self {
+    pub fn children(mut self, children: Vec<Element>) -> Self {
         self.children = Some(children);
         self
     }
 
-    fn build(self) -> Element {
+    pub fn build(self) -> Element {
         Element {
             tag: self.tag,
             attrs: self.attrs,

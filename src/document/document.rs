@@ -4,7 +4,7 @@ use crate::element::Element;
 use crate::tag::Tags;
 
 #[derive(Debug, Default, Clone, PartialEq)]
-enum Doctype {
+pub enum Doctype {
     #[default]
     Html,
 }
@@ -17,9 +17,9 @@ impl Display for Doctype {
 }
 
 #[derive(Debug)]
-struct Document {
-    doctype: Doctype,
-    tags: Vec<Element>,
+pub struct Document {
+    pub doctype: Doctype,
+    pub tags: Vec<Element>,
 }
 impl Display for Document {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
