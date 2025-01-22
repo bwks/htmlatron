@@ -18,11 +18,11 @@ impl Display for Doctype {
 #[derive(Debug)]
 struct Document {
     doctype: Doctype,
-    tags: Vec<Tag>,
+    tags: Vec<Elem>,
 }
 impl Display for Document {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let doctype = Tags::open_tag(&Tags::Doctype, &Doctype::Html.to_string());
+        let doctype = Elem::open_tag(&Tags::Doctype, &Doctype::Html.to_string());
         let result: String = self.tags.iter().map(|tag| tag.to_string()).collect();
         write!(f, "{}{}", doctype, result)
     }
@@ -69,11 +69,14 @@ enum Tags {
     Header,
     Html,
     Img,
+    Li,
     Link,
     Meta,
+    Ol,
     P,
     Script,
     Title,
+    Ul,
 }
 impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -91,47 +94,30 @@ impl Display for Tags {
             Tags::Header => write!(f, "header"),
             Tags::Html => write!(f, "html"),
             Tags::Img => write!(f, "img"),
+            Tags::Li => write!(f, "li"),
             Tags::Link => write!(f, "link"),
             Tags::Meta => write!(f, "meta"),
+            Tags::Ol => write!(f, "ol"),
             Tags::P => write!(f, "p"),
             Tags::Script => write!(f, "script"),
             Tags::Title => write!(f, "title"),
-        }
-    }
-}
-impl Tags {
-    fn open_tag(tag: &Tags, value: &str) -> String {
-        match tag {
-            Tags::Comment => format!("<!-- {} -->", value),
-            _ => {
-                if !value.is_empty() {
-                    format!("<{} {}>", tag, value)
-                } else {
-                    format!("<{}>", tag)
-                }
-            }
-        }
-    }
-    fn close_tag(tag: &Tags) -> String {
-        match tag {
-            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br | Tags::Img => "".to_string(),
-            _ => format!("</{}>", tag),
+            Tags::Ul => write!(f, "ul"),
         }
     }
 }
 
 #[derive(Debug)]
-struct TagBuilder {
+struct ElemBuilder {
     tag: Tags,
     attr: Option<Attrs>,
     text: Option<&'static str>,
     content: Option<&'static str>,
-    children: Option<Vec<Tag>>,
+    children: Option<Vec<Elem>>,
 }
 
-impl TagBuilder {
+impl ElemBuilder {
     fn new(tag: Tags) -> Self {
-        TagBuilder {
+        ElemBuilder {
             tag,
             attr: None,
             text: None,
@@ -162,13 +148,13 @@ impl TagBuilder {
     }
 
     // Nested tags
-    fn children(mut self, children: Vec<Tag>) -> Self {
+    fn children(mut self, children: Vec<Elem>) -> Self {
         self.children = Some(children);
         self
     }
 
-    fn build(self) -> Tag {
-        Tag {
+    fn build(self) -> Elem {
+        Elem {
             tag: self.tag,
             attr: self.attr,
             text: self.text,
@@ -180,15 +166,129 @@ impl TagBuilder {
 
 // blah
 #[derive(Debug, Clone)]
-struct Tag {
+struct Elem {
     tag: Tags,
     attr: Option<Attrs>,
     text: Option<&'static str>,
     content: Option<&'static str>,
-    children: Option<Vec<Tag>>,
+    children: Option<Vec<Elem>>,
 }
-impl Display for Tag {
+impl Display for Elem {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let fmt_str = self.make_tag();
+        write!(f, "{fmt_str}")
+    }
+}
+
+// Macro version of generating Tag methods
+// macro_rules! create_tag_fn {
+//     ($($name:ident => $tag:expr),*) => {
+//         $(
+//             fn $name() -> TagBuilder {
+//                 TagBuilder::new($tag)
+//             }
+//         )*
+//     }
+// }
+
+// impl Tag {
+//     create_tag_fn! {
+//         doctype => Tags::Doctype,
+//         comment => Tags::Comment,
+//         html => Tags::Html,
+//         header => Tags::Header,
+//         footer => Tags::Footer,
+//         body => Tags::Body,
+//         div => Tags::Div,
+//         h1 => Tags::H1,
+//         p => Tags::P,
+//         meta => Tags::Meta,
+//         title => Tags::Title
+//     }
+// }
+//
+
+impl Elem {
+    // region:    ===== HTML Elements ===== //
+
+    fn comment() -> ElemBuilder {
+        ElemBuilder::new(Tags::Comment)
+    }
+    fn html() -> ElemBuilder {
+        ElemBuilder::new(Tags::Html)
+    }
+    fn header() -> ElemBuilder {
+        ElemBuilder::new(Tags::Header)
+    }
+    fn footer() -> ElemBuilder {
+        ElemBuilder::new(Tags::Footer)
+    }
+    fn body() -> ElemBuilder {
+        ElemBuilder::new(Tags::Body)
+    }
+    fn div() -> ElemBuilder {
+        ElemBuilder::new(Tags::Div)
+    }
+    fn h1() -> ElemBuilder {
+        ElemBuilder::new(Tags::H1)
+    }
+    fn p() -> ElemBuilder {
+        ElemBuilder::new(Tags::P)
+    }
+    fn meta() -> ElemBuilder {
+        ElemBuilder::new(Tags::Meta)
+    }
+    fn title() -> ElemBuilder {
+        ElemBuilder::new(Tags::Title)
+    }
+    fn br() -> ElemBuilder {
+        ElemBuilder::new(Tags::Br)
+    }
+    fn img() -> ElemBuilder {
+        ElemBuilder::new(Tags::Img)
+    }
+    fn a() -> ElemBuilder {
+        ElemBuilder::new(Tags::A)
+    }
+    fn script() -> ElemBuilder {
+        ElemBuilder::new(Tags::Script)
+    }
+    fn link() -> ElemBuilder {
+        ElemBuilder::new(Tags::Link)
+    }
+    fn ol() -> ElemBuilder {
+        ElemBuilder::new(Tags::Ol)
+    }
+    fn ul() -> ElemBuilder {
+        ElemBuilder::new(Tags::Ul)
+    }
+    fn li() -> ElemBuilder {
+        ElemBuilder::new(Tags::Li)
+    }
+
+    // endregion: ===== HTML Elements ===== //
+
+    // region:    ===== Utility Methods ===== //
+
+    fn open_tag(tag: &Tags, value: &str) -> String {
+        match tag {
+            Tags::Comment => format!("<!-- {} -->", value),
+            _ => {
+                if !value.is_empty() {
+                    format!("<{} {}>", tag, value)
+                } else {
+                    format!("<{}>", tag)
+                }
+            }
+        }
+    }
+    fn close_tag(tag: &Tags) -> String {
+        match tag {
+            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br | Tags::Img => "".to_string(),
+            _ => format!("</{}>", tag),
+        }
+    }
+    fn make_tag(&self) -> String {
         let content = self
             .content
             .as_ref()
@@ -226,93 +326,25 @@ impl Display for Tag {
             }
         }
         let open_tag = if !attributes.is_empty() {
-            Tags::open_tag(&self.tag, &attributes.join(" "))
+            Elem::open_tag(&self.tag, &attributes.join(" "))
         } else if self.text.is_some() {
-            Tags::open_tag(&self.tag, self.text.unwrap())
+            Elem::open_tag(&self.tag, self.text.unwrap())
         } else {
-            Tags::open_tag(&self.tag, &"".to_string())
+            Elem::open_tag(&self.tag, &"".to_string())
         };
 
-        let close_tag = Tags::close_tag(&self.tag);
+        let close_tag = Elem::close_tag(&self.tag);
 
-        write!(f, r#"{open_tag}{content}{children}{close_tag}"#)
+        // write!(f, r#"{open_tag}{content}{children}{close_tag}"#)
+        let fmt_str = format!(
+            r#"
+        {open_tag}{content}{children}{close_tag}
+        "#
+        );
+        fmt_str
     }
-}
 
-// Macro version of generating Tag methods
-// macro_rules! create_tag_fn {
-//     ($($name:ident => $tag:expr),*) => {
-//         $(
-//             fn $name() -> TagBuilder {
-//                 TagBuilder::new($tag)
-//             }
-//         )*
-//     }
-// }
-
-// impl Tag {
-//     create_tag_fn! {
-//         doctype => Tags::Doctype,
-//         comment => Tags::Comment,
-//         html => Tags::Html,
-//         header => Tags::Header,
-//         footer => Tags::Footer,
-//         body => Tags::Body,
-//         div => Tags::Div,
-//         h1 => Tags::H1,
-//         p => Tags::P,
-//         meta => Tags::Meta,
-//         title => Tags::Title
-//     }
-// }
-//
-
-impl Tag {
-    fn comment() -> TagBuilder {
-        TagBuilder::new(Tags::Comment)
-    }
-    fn html() -> TagBuilder {
-        TagBuilder::new(Tags::Html)
-    }
-    fn header() -> TagBuilder {
-        TagBuilder::new(Tags::Header)
-    }
-    fn footer() -> TagBuilder {
-        TagBuilder::new(Tags::Footer)
-    }
-    fn body() -> TagBuilder {
-        TagBuilder::new(Tags::Body)
-    }
-    fn div() -> TagBuilder {
-        TagBuilder::new(Tags::Div)
-    }
-    fn h1() -> TagBuilder {
-        TagBuilder::new(Tags::H1)
-    }
-    fn p() -> TagBuilder {
-        TagBuilder::new(Tags::P)
-    }
-    fn meta() -> TagBuilder {
-        TagBuilder::new(Tags::Meta)
-    }
-    fn title() -> TagBuilder {
-        TagBuilder::new(Tags::Title)
-    }
-    fn br() -> TagBuilder {
-        TagBuilder::new(Tags::Br)
-    }
-    fn img() -> TagBuilder {
-        TagBuilder::new(Tags::Img)
-    }
-    fn a() -> TagBuilder {
-        TagBuilder::new(Tags::A)
-    }
-    fn script() -> TagBuilder {
-        TagBuilder::new(Tags::Script)
-    }
-    fn link() -> TagBuilder {
-        TagBuilder::new(Tags::Link)
-    }
+    // endregion: ===== Utility Methods ===== //
 }
 
 //
@@ -533,57 +565,74 @@ fn main() {
     let class1 = vec!["three", "four"];
     let class2 = vec!["seven", "eight"];
     let lang = "en";
-    let meta = Tag::meta()
+    let meta = Elem::meta()
         .attrs(Attrs::new().charset("utf-8").build())
         .build();
-    let title = Tag::title().content("The is the title").build();
-    let comment = Tag::comment().text("this is a comment").build();
+    let title = Elem::title().content("The is the title").build();
+    let comment = Elem::comment().text("this is a comment").build();
 
-    let html = Tag::html().attrs(Attrs::new().lang(lang).build());
-    let js = Tag::script()
+    let html = Elem::html().attrs(Attrs::new().lang(lang).build());
+    let js = Elem::script()
         .attrs(Attrs::new().src("script.js").build())
         .build();
-    let css = Tag::link()
+    let css = Elem::link()
         .attrs(Attrs::new().rel("stylesheet").href("styles.css").build())
         .build();
 
-    let image = Tag::img()
+    let image = Elem::img()
         .attrs(Attrs::new().src("blah.img").alt("some image").build())
         .build();
 
-    let header = Tag::header()
+    let header = Elem::header()
         .attrs(Attrs::new().id("header").build())
         .children(vec![meta, css, js, title])
         .build();
 
-    let footer = Tag::footer()
+    let footer = Elem::footer()
         .attrs(Attrs::new().id("footer").build())
         .build();
 
-    let line_break = Tag::br().build();
+    let line_break = Elem::br().build();
 
-    let content = Tag::div()
+    let ul = Elem::ul()
+        .children(vec![
+            Elem::li().build(),
+            Elem::li().build(),
+            Elem::li().build(),
+        ])
+        .build();
+    let ol = Elem::ol()
+        .children(vec![
+            Elem::li().build(),
+            Elem::li().build(),
+            Elem::li().build(),
+        ])
+        .build();
+
+    let content = Elem::div()
         .attrs(Attrs::new().id(id1).class(class1.clone()).build())
         .children(vec![
             //
             image,
-            Tag::div()
+            Elem::div()
                 .attrs(Attrs::new().id(id2).class(class2.clone()).build())
                 .children(vec![
-                    Tag::h1().content("Heading").build(),
-                    Tag::p()
+                    Elem::h1().content("Heading").build(),
+                    Elem::p()
                         .content("blah blah blah")
-                        .children(vec![Tag::a()
+                        .children(vec![Elem::a()
                             .attrs(Attrs::new().href("http://stuff.things").build())
                             .content("Stuff and Things")
                             .build()])
                         .build(),
+                    ul,
+                    ol,
                 ])
                 .build(),
         ])
         .build();
 
-    let body = Tag::body()
+    let body = Elem::body()
         .attrs(Attrs::new().class(vec!["body"]).build())
         .children(vec![content])
         .build();
