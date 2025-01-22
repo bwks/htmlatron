@@ -2,68 +2,123 @@
 
 use std::fmt::Display;
 
+#[derive(Debug, Default, Clone, PartialEq)]
+enum Doctype {
+    #[default]
+    Html,
+}
+impl Display for Doctype {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Doctype::Html => write!(f, "html"),
+        }
+    }
+}
+
 #[derive(Debug)]
 struct Document {
+    doctype: Doctype,
     tags: Vec<Tag>,
 }
 impl Display for Document {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        let doctype = Tags::open_tag(&Tags::Doctype, &Doctype::Html.to_string());
         let result: String = self.tags.iter().map(|tag| tag.to_string()).collect();
-        write!(f, "{}", result)
+        write!(f, "{}{}", doctype, result)
+    }
+}
+
+#[derive(Debug, Clone, PartialEq)]
+enum Attr {
+    Alt,
+    Charset,
+    Class,
+    Href,
+    Id,
+    Lang,
+    Src,
+    Rel,
+}
+impl Display for Attr {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Attr::Alt => write!(f, "alt"),
+            Attr::Charset => write!(f, "charset"),
+            Attr::Class => write!(f, "class"),
+            Attr::Href => write!(f, "href"),
+            Attr::Id => write!(f, "id"),
+            Attr::Lang => write!(f, "lang"),
+            Attr::Src => write!(f, "src"),
+            Attr::Rel => write!(f, "rel"),
+        }
     }
 }
 
 #[derive(Debug, Clone, PartialEq)]
 enum Tags {
-    Doctype,
-    Comment,
-    Html,
-    Header,
-    Footer,
+    A,
     Body,
-    Meta,
-    Title,
+    Br,
+    Comment,
     Div,
+    Doctype,
+    Footer,
     H1,
     H2,
     H3,
-    P,
-    Br,
+    Header,
+    Html,
     Img,
-    A,
+    Link,
+    Meta,
+    P,
+    Script,
+    Title,
 }
 impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            Tags::Doctype => write!(f, "!DOCTYPE"),
-            Tags::Comment => write!(f, "!--"),
-            Tags::Html => write!(f, "html"),
-            Tags::Header => write!(f, "header"),
-            Tags::Footer => write!(f, "footer"),
+            Tags::A => write!(f, "a"),
             Tags::Body => write!(f, "body"),
-            Tags::Meta => write!(f, "meta"),
-            Tags::Title => write!(f, "title"),
+            Tags::Br => write!(f, "br"),
+            Tags::Comment => write!(f, "!--"),
             Tags::Div => write!(f, "div"),
+            Tags::Doctype => write!(f, "!DOCTYPE"),
+            Tags::Footer => write!(f, "footer"),
             Tags::H1 => write!(f, "h1"),
             Tags::H2 => write!(f, "h2"),
             Tags::H3 => write!(f, "h3"),
-            Tags::P => write!(f, "p"),
-            Tags::Br => write!(f, "br"),
+            Tags::Header => write!(f, "header"),
+            Tags::Html => write!(f, "html"),
             Tags::Img => write!(f, "img"),
-            Tags::A => write!(f, "a"),
+            Tags::Link => write!(f, "link"),
+            Tags::Meta => write!(f, "meta"),
+            Tags::P => write!(f, "p"),
+            Tags::Script => write!(f, "script"),
+            Tags::Title => write!(f, "title"),
         }
     }
 }
 impl Tags {
-    fn close_tag(&self) -> String {
-        match self {
+    fn open_tag(tag: &Tags, value: &str) -> String {
+        match tag {
+            Tags::Comment => format!("<!-- {} -->", value),
+            _ => {
+                if !value.is_empty() {
+                    format!("<{} {}>", tag, value)
+                } else {
+                    format!("<{}>", tag)
+                }
+            }
+        }
+    }
+    fn close_tag(tag: &Tags) -> String {
+        match tag {
             Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br | Tags::Img => "".to_string(),
-            _ => format!("</{}>", self),
+            _ => format!("</{}>", tag),
         }
     }
 }
-
-////////////
 
 #[derive(Debug)]
 struct TagBuilder {
@@ -134,8 +189,6 @@ struct Tag {
 }
 impl Display for Tag {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        let tag = self.tag.to_string();
-
         let content = self
             .content
             .as_ref()
@@ -145,57 +198,44 @@ impl Display for Tag {
             children.iter().map(|child| child.to_string()).collect()
         });
 
-        let mut open_tag = String::new();
-        open_tag.push_str(&tag);
+        let mut attributes = vec![];
         if let Some(attr) = self.attr.as_ref() {
-            if attr.id.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.id.as_ref().unwrap().to_string());
-            }
-            if attr.class.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.class.as_ref().unwrap().to_string());
-            }
-            if attr.lang.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.lang.as_ref().unwrap().to_string());
+            if attr.alt.is_some() {
+                attributes.push(attr.alt.as_ref().unwrap().to_string())
             }
             if attr.charset.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.charset.as_ref().unwrap().to_string());
+                attributes.push(attr.charset.as_ref().unwrap().to_string())
             }
-            if attr.src.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.src.as_ref().unwrap().to_string());
-            }
-            if attr.alt.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.alt.as_ref().unwrap().to_string());
+            if attr.class.is_some() {
+                attributes.push(attr.class.as_ref().unwrap().to_string())
             }
             if attr.href.is_some() {
-                open_tag.push_str(" ");
-                open_tag.push_str(&attr.href.as_ref().unwrap().to_string());
+                attributes.push(attr.href.as_ref().unwrap().to_string())
+            }
+            if attr.id.is_some() {
+                attributes.push(attr.id.as_ref().unwrap().to_string())
+            }
+            if attr.lang.is_some() {
+                attributes.push(attr.lang.as_ref().unwrap().to_string())
+            }
+            if attr.rel.is_some() {
+                attributes.push(attr.rel.as_ref().unwrap().to_string())
+            }
+            if attr.src.is_some() {
+                attributes.push(attr.src.as_ref().unwrap().to_string())
             }
         }
-        if self.text.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.text.as_ref().unwrap());
-        }
+        let open_tag = if !attributes.is_empty() {
+            Tags::open_tag(&self.tag, &attributes.join(" "))
+        } else if self.text.is_some() {
+            Tags::open_tag(&self.tag, self.text.unwrap())
+        } else {
+            Tags::open_tag(&self.tag, &"".to_string())
+        };
 
-        // Tag logic
-        if self.tag == Tags::Comment {
-            open_tag.push_str(" --");
-        }
+        let close_tag = Tags::close_tag(&self.tag);
 
-        let close_tag = self.tag.close_tag();
-
-        write!(
-            f,
-            r#"<{open_tag}>
-  {content}{children}
-{close_tag}
-"#
-        )
+        write!(f, r#"{open_tag}{content}{children}{close_tag}"#)
     }
 }
 
@@ -228,9 +268,6 @@ impl Display for Tag {
 //
 
 impl Tag {
-    fn doctype() -> TagBuilder {
-        TagBuilder::new(Tags::Doctype)
-    }
     fn comment() -> TagBuilder {
         TagBuilder::new(Tags::Comment)
     }
@@ -270,9 +307,15 @@ impl Tag {
     fn a() -> TagBuilder {
         TagBuilder::new(Tags::A)
     }
+    fn script() -> TagBuilder {
+        TagBuilder::new(Tags::Script)
+    }
+    fn link() -> TagBuilder {
+        TagBuilder::new(Tags::Link)
+    }
 }
 
-////////
+//
 #[derive(Debug, Default, Clone)]
 struct Attrs {
     // Global
@@ -283,6 +326,7 @@ struct Attrs {
     src: Option<Src>,
     alt: Option<Alt>,
     href: Option<Href>,
+    rel: Option<Rel>,
 }
 
 struct AttrsBuilder {
@@ -293,6 +337,7 @@ struct AttrsBuilder {
     src: Option<Src>,
     alt: Option<Alt>,
     href: Option<Href>,
+    rel: Option<Rel>,
 }
 
 impl AttrsBuilder {
@@ -305,6 +350,7 @@ impl AttrsBuilder {
             src: None,
             alt: None,
             href: None,
+            rel: None,
         }
     }
 
@@ -349,6 +395,11 @@ impl AttrsBuilder {
         self
     }
 
+    fn rel(mut self, rel: &'static str) -> Self {
+        self.rel = Some(Rel(rel));
+        self
+    }
+
     fn build(self) -> Attrs {
         Attrs {
             id: self.id,
@@ -358,6 +409,7 @@ impl AttrsBuilder {
             src: self.src,
             alt: self.alt,
             href: self.href,
+            rel: self.rel,
         }
     }
 }
@@ -379,7 +431,7 @@ impl Display for Id {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Id(value) => {
-                write!(f, r#"id="{value}""#)
+                write!(f, r#"{}="{}""#, Attr::Id, value)
             }
         }
     }
@@ -391,7 +443,7 @@ impl Display for Class {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Class(values) => {
-                write!(f, r#"class="{}""#, values.join(" "))
+                write!(f, r#"{}="{}""#, Attr::Class, values.join(" "))
             }
         }
     }
@@ -404,7 +456,7 @@ impl Display for Lang {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Lang(value) => {
-                write!(f, r#"lang="{value}""#)
+                write!(f, r#"{}="{}""#, Attr::Lang, value)
             }
         }
     }
@@ -417,7 +469,7 @@ impl Display for Charset {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Charset(value) => {
-                write!(f, r#"charset="{value}""#)
+                write!(f, r#"{}="{}""#, Attr::Charset, value)
             }
         }
     }
@@ -430,7 +482,7 @@ impl Display for Src {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Src(value) => {
-                write!(f, r#"src="{}""#, value)
+                write!(f, r#"{}="{}""#, Attr::Src, value)
             }
         }
     }
@@ -443,7 +495,7 @@ impl Display for Alt {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Alt(value) => {
-                write!(f, r#"alt="{}""#, value)
+                write!(f, r#"{}="{}""#, Attr::Alt, value)
             }
         }
     }
@@ -456,7 +508,20 @@ impl Display for Href {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Href(value) => {
-                write!(f, r#"href="{}""#, value)
+                write!(f, r#"{}="{}""#, Attr::Href, value)
+            }
+        }
+    }
+}
+
+#[derive(Debug, Clone)]
+struct Rel(&'static str);
+
+impl Display for Rel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Rel(value) => {
+                write!(f, r#"{}="{}""#, Attr::Rel, value)
             }
         }
     }
@@ -474,8 +539,13 @@ fn main() {
     let title = Tag::title().content("The is the title").build();
     let comment = Tag::comment().text("this is a comment").build();
 
-    let doctype = Tag::doctype().text("html").build();
     let html = Tag::html().attrs(Attrs::new().lang(lang).build());
+    let js = Tag::script()
+        .attrs(Attrs::new().src("script.js").build())
+        .build();
+    let css = Tag::link()
+        .attrs(Attrs::new().rel("stylesheet").href("styles.css").build())
+        .build();
 
     let image = Tag::img()
         .attrs(Attrs::new().src("blah.img").alt("some image").build())
@@ -483,7 +553,7 @@ fn main() {
 
     let header = Tag::header()
         .attrs(Attrs::new().id("header").build())
-        .children(vec![meta, title])
+        .children(vec![meta, css, js, title])
         .build();
 
     let footer = Tag::footer()
@@ -501,9 +571,12 @@ fn main() {
                 .attrs(Attrs::new().id(id2).class(class2.clone()).build())
                 .children(vec![
                     Tag::h1().content("Heading").build(),
-                    Tag::p().content("blah blah blah").build(),
-                    Tag::a()
-                        .attrs(Attrs::new().href("http://stuff.things").build())
+                    Tag::p()
+                        .content("blah blah blah")
+                        .children(vec![Tag::a()
+                            .attrs(Attrs::new().href("http://stuff.things").build())
+                            .content("Stuff and Things")
+                            .build()])
                         .build(),
                 ])
                 .build(),
@@ -516,8 +589,8 @@ fn main() {
         .build();
 
     let document = Document {
+        doctype: Doctype::Html,
         tags: vec![
-            doctype,
             comment,
             html.children(vec![
                 header,
