@@ -63,16 +63,12 @@ impl Tags {
     }
 }
 
+////////////
+
 #[derive(Debug)]
 struct TagBuilder {
     tag: Tags,
-    id: Option<Id>,
-    class: Option<Class>,
-    lang: Option<Lang>,
-    charset: Option<Charset>,
-    src: Option<Src>,
-    alt: Option<Alt>,
-    href: Option<Href>,
+    attr: Option<Attrs>,
     text: Option<&'static str>,
     content: Option<&'static str>,
     children: Option<Vec<Tag>>,
@@ -82,13 +78,7 @@ impl TagBuilder {
     fn new(tag: Tags) -> Self {
         TagBuilder {
             tag,
-            id: None,
-            class: None,
-            lang: None,
-            charset: None,
-            src: None,
-            alt: None,
-            href: None,
+            attr: None,
             text: None,
             content: None,
             children: None,
@@ -96,46 +86,10 @@ impl TagBuilder {
     }
 
     // region:    ===== Global Attributes ===== //
-    fn id(mut self, id: Id) -> Self {
-        self.id = Some(id);
+    fn attrs(mut self, attr: Attrs) -> Self {
+        self.attr = Some(attr);
         self
     }
-
-    fn class(mut self, class: Class) -> Self {
-        self.class = Some(class);
-        self
-    }
-
-    fn lang(mut self, lang: Lang) -> Self {
-        self.lang = Some(lang);
-        self
-    }
-    // endregion: ===== Global Attributes ===== //
-
-    // meta
-    fn charset(mut self, charset: Charset) -> Self {
-        self.charset = Some(charset);
-        self
-    }
-
-    // region:    ===== img tag attributes ===== //
-    fn src(mut self, src: Src) -> Self {
-        self.src = Some(src);
-        self
-    }
-
-    fn alt(mut self, alt: Alt) -> Self {
-        self.alt = Some(alt);
-        self
-    }
-    // endregion: ===== img tag attributes ===== //
-
-    // region:    ===== a tag attributes ===== //
-    fn href(mut self, href: Href) -> Self {
-        self.href = Some(href);
-        self
-    }
-
     // target
 
     // endregion: ===== a tag attributes ===== //
@@ -161,13 +115,7 @@ impl TagBuilder {
     fn build(self) -> Tag {
         Tag {
             tag: self.tag,
-            id: self.id,
-            class: self.class,
-            lang: self.lang,
-            charset: self.charset,
-            src: self.src,
-            alt: self.alt,
-            href: self.href,
+            attr: self.attr,
             text: self.text,
             content: self.content,
             children: self.children,
@@ -179,13 +127,7 @@ impl TagBuilder {
 #[derive(Debug, Clone)]
 struct Tag {
     tag: Tags,
-    id: Option<Id>,
-    class: Option<Class>,
-    lang: Option<Lang>,
-    charset: Option<Charset>,
-    src: Option<Src>,
-    alt: Option<Alt>,
-    href: Option<Href>,
+    attr: Option<Attrs>,
     text: Option<&'static str>,
     content: Option<&'static str>,
     children: Option<Vec<Tag>>,
@@ -205,33 +147,35 @@ impl Display for Tag {
 
         let mut open_tag = String::new();
         open_tag.push_str(&tag);
-        if self.id.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.id.as_ref().unwrap().to_string());
-        }
-        if self.class.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.class.as_ref().unwrap().to_string());
-        }
-        if self.lang.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.lang.as_ref().unwrap().to_string());
-        }
-        if self.charset.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.charset.as_ref().unwrap().to_string());
-        }
-        if self.src.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.src.as_ref().unwrap().to_string());
-        }
-        if self.alt.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.alt.as_ref().unwrap().to_string());
-        }
-        if self.href.is_some() {
-            open_tag.push_str(" ");
-            open_tag.push_str(&self.href.as_ref().unwrap().to_string());
+        if let Some(attr) = self.attr.as_ref() {
+            if attr.id.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.id.as_ref().unwrap().to_string());
+            }
+            if attr.class.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.class.as_ref().unwrap().to_string());
+            }
+            if attr.lang.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.lang.as_ref().unwrap().to_string());
+            }
+            if attr.charset.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.charset.as_ref().unwrap().to_string());
+            }
+            if attr.src.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.src.as_ref().unwrap().to_string());
+            }
+            if attr.alt.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.alt.as_ref().unwrap().to_string());
+            }
+            if attr.href.is_some() {
+                open_tag.push_str(" ");
+                open_tag.push_str(&attr.href.as_ref().unwrap().to_string());
+            }
         }
         if self.text.is_some() {
             open_tag.push_str(" ");
@@ -328,6 +272,106 @@ impl Tag {
     }
 }
 
+////////
+#[derive(Debug, Default, Clone)]
+struct Attrs {
+    // Global
+    id: Option<Id>,
+    class: Option<Class>,
+    lang: Option<Lang>,
+    charset: Option<Charset>,
+    src: Option<Src>,
+    alt: Option<Alt>,
+    href: Option<Href>,
+}
+
+struct AttrsBuilder {
+    id: Option<Id>,
+    class: Option<Class>,
+    lang: Option<Lang>,
+    charset: Option<Charset>,
+    src: Option<Src>,
+    alt: Option<Alt>,
+    href: Option<Href>,
+}
+
+impl AttrsBuilder {
+    fn new() -> Self {
+        AttrsBuilder {
+            id: None,
+            class: None,
+            lang: None,
+            charset: None,
+            src: None,
+            alt: None,
+            href: None,
+        }
+    }
+
+    // region:    ===== Global Attributes ===== //
+    fn id(mut self, id: &'static str) -> Self {
+        self.id = Some(Id(id));
+        self
+    }
+
+    fn class(mut self, class: Vec<&'static str>) -> Self {
+        self.class = Some(Class(class));
+        self
+    }
+
+    fn lang(mut self, lang: &'static str) -> Self {
+        self.lang = Some(Lang(lang));
+        self
+    }
+    // endregion: ===== Global Attributes ===== //
+
+    // meta
+    fn charset(mut self, charset: &'static str) -> Self {
+        self.charset = Some(Charset(charset));
+        self
+    }
+
+    // region:    ===== img tag attributes ===== //
+    fn src(mut self, src: &'static str) -> Self {
+        self.src = Some(Src(src));
+        self
+    }
+
+    fn alt(mut self, alt: &'static str) -> Self {
+        self.alt = Some(Alt(alt));
+        self
+    }
+    // endregion: ===== img tag attributes ===== //
+
+    // region:    ===== a tag attributes ===== //
+    fn href(mut self, href: &'static str) -> Self {
+        self.href = Some(Href(href));
+        self
+    }
+
+    fn build(self) -> Attrs {
+        Attrs {
+            id: self.id,
+            class: self.class,
+            lang: self.lang,
+            charset: self.charset,
+            src: self.src,
+            alt: self.alt,
+            href: self.href,
+        }
+    }
+}
+
+impl Attrs {
+    fn new() -> AttrsBuilder {
+        AttrsBuilder::new()
+    }
+}
+
+fn attrs() -> AttrsBuilder {
+    AttrsBuilder::new()
+}
+
 #[derive(Debug, Clone)]
 struct Id(&'static str);
 
@@ -419,52 +463,55 @@ impl Display for Href {
 }
 
 fn main() {
-    let id1 = Id("one");
-    let id2 = Id("two");
-    let class1 = Class(vec!["three", "four"]);
-    let class2 = Class(vec!["seven", "eight"]);
-    let lang = Lang("en");
-    let meta = Tag::meta().charset(Charset("utf-8")).build();
+    let id1 = "one";
+    let id2 = "two";
+    let class1 = vec!["three", "four"];
+    let class2 = vec!["seven", "eight"];
+    let lang = "en";
+    let meta = Tag::meta()
+        .attrs(Attrs::new().charset("utf-8").build())
+        .build();
     let title = Tag::title().content("The is the title").build();
     let comment = Tag::comment().text("this is a comment").build();
 
     let doctype = Tag::doctype().text("html").build();
-    let html = Tag::html().lang(lang);
+    let html = Tag::html().attrs(Attrs::new().lang(lang).build());
 
     let image = Tag::img()
-        .src(Src("blah.img"))
-        .alt(Alt("some image"))
+        .attrs(Attrs::new().src("blah.img").alt("some image").build())
         .build();
 
     let header = Tag::header()
-        .id(Id("header"))
+        .attrs(Attrs::new().id("header").build())
         .children(vec![meta, title])
         .build();
 
-    let footer = Tag::footer().id(Id("footer")).build();
+    let footer = Tag::footer()
+        .attrs(Attrs::new().id("footer").build())
+        .build();
 
     let line_break = Tag::br().build();
 
     let content = Tag::div()
-        .id(id1.clone())
-        .class(class1.clone())
+        .attrs(Attrs::new().id(id1).class(class1.clone()).build())
         .children(vec![
             //
             image,
             Tag::div()
-                .id(id2.clone())
-                .class(class2.clone())
+                .attrs(Attrs::new().id(id2).class(class2.clone()).build())
                 .children(vec![
                     Tag::h1().content("Heading").build(),
                     Tag::p().content("blah blah blah").build(),
-                    Tag::a().href(Href("http://stuff.things")).build(),
+                    Tag::a()
+                        .attrs(Attrs::new().href("http://stuff.things").build())
+                        .build(),
                 ])
                 .build(),
         ])
         .build();
 
     let body = Tag::body()
-        .class(Class(vec!["body"]))
+        .attrs(Attrs::new().class(vec!["body"]).build())
         .children(vec![content])
         .build();
 
