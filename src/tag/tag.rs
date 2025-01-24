@@ -23,7 +23,9 @@ pub enum Tags {
     Meta,
     Ol,
     P,
+    Pre,
     Script,
+    Span,
     Title,
     Ul,
 }
@@ -51,7 +53,9 @@ impl Display for Tags {
             Tags::Meta => write!(f, "meta"),
             Tags::Ol => write!(f, "ol"),
             Tags::P => write!(f, "p"),
+            Tags::Pre => write!(f, "pre"),
             Tags::Script => write!(f, "script"),
+            Tags::Span => write!(f, "span"),
             Tags::Title => write!(f, "title"),
             Tags::Ul => write!(f, "ul"),
         }

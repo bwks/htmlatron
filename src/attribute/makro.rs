@@ -6,7 +6,7 @@ use super::attribute::Attr;
 macro_rules! html_attribute {
     ($name:ident => $attr:expr) => {
         #[derive(Debug, Clone)]
-        pub struct $name(pub &'static str);
+        pub struct $name(pub String);
 
         impl Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -28,3 +28,4 @@ html_attribute!(Id => Attr::Id);
 html_attribute!(Lang => Attr::Lang);
 html_attribute!(Rel => Attr::Rel);
 html_attribute!(Src => Attr::Src);
+html_attribute!(Width => Attr::Width);

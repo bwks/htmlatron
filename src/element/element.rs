@@ -3,12 +3,12 @@ use std::fmt::Display;
 use crate::attribute::Attrs;
 use crate::tag::Tags;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct ElementBuilder {
     pub tag: Tags,
     pub attrs: Option<Attrs>,
-    pub text: Option<&'static str>,
-    pub content: Option<&'static str>,
+    pub text: Option<String>,
+    pub content: Option<String>,
     pub children: Option<Vec<Element>>,
 }
 
@@ -33,14 +33,14 @@ impl ElementBuilder {
     // endregion: ===== a tag attributes ===== //
 
     // Text within a tag
-    pub fn text(mut self, text: &'static str) -> Self {
-        self.text = Some(text);
+    pub fn text(mut self, text: &str) -> Self {
+        self.text = Some(text.to_owned());
         self
     }
 
     // Content within a opening and closing tags
-    pub fn content(mut self, content: &'static str) -> Self {
-        self.content = Some(content);
+    pub fn content(mut self, content: &str) -> Self {
+        self.content = Some(content.to_owned());
         self
     }
 
@@ -66,8 +66,8 @@ impl ElementBuilder {
 pub struct Element {
     pub tag: Tags,
     pub attrs: Option<Attrs>,
-    pub text: Option<&'static str>,
-    pub content: Option<&'static str>,
+    pub text: Option<String>,
+    pub content: Option<String>,
     pub children: Option<Vec<Element>>,
 }
 impl Display for Element {
@@ -80,7 +80,7 @@ impl Display for Element {
 impl Element {
     // region:    ===== Utility Methods ===== //
 
-    pub fn open_tag(tag: &Tags, value: &str) -> String {
+    pub fn open_tag(tag: &Tags, value: &String) -> String {
         match tag {
             Tags::Comment => format!("<!-- {} -->", value),
             _ => {
@@ -114,7 +114,7 @@ impl Element {
         let open_tag = if !attributes.is_empty() {
             Element::open_tag(&self.tag, &attributes.join(" "))
         } else if self.text.is_some() {
-            Element::open_tag(&self.tag, self.text.unwrap())
+            Element::open_tag(&self.tag, &self.text.as_ref().unwrap())
         } else {
             Element::open_tag(&self.tag, &"".to_string())
         };

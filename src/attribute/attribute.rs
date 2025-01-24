@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{Alt, Charset, Href, Id, Lang, Rel, Src};
+use super::{Alt, Charset, Href, Id, Lang, Rel, Src, Width};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
@@ -12,6 +12,7 @@ pub enum Attr {
     Lang,
     Src,
     Rel,
+    Width,
 }
 impl Display for Attr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -24,12 +25,13 @@ impl Display for Attr {
             Attr::Lang => write!(f, "lang"),
             Attr::Src => write!(f, "src"),
             Attr::Rel => write!(f, "rel"),
+            Attr::Width => write!(f, "width"),
         }
     }
 }
 
 #[derive(Debug, Clone)]
-pub struct Class(Vec<&'static str>);
+pub struct Class(Vec<String>);
 
 impl Display for Class {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
@@ -52,6 +54,7 @@ pub struct Attrs {
     pub alt: Option<Alt>,
     pub href: Option<Href>,
     pub rel: Option<Rel>,
+    pub width: Option<Width>,
 }
 
 impl Attrs {
@@ -78,11 +81,14 @@ impl Attrs {
         if self.lang.is_some() {
             attributes.push(self.lang.as_ref().unwrap().to_string())
         }
+        if self.src.is_some() {
+            attributes.push(self.src.as_ref().unwrap().to_string())
+        }
         if self.rel.is_some() {
             attributes.push(self.rel.as_ref().unwrap().to_string())
         }
-        if self.src.is_some() {
-            attributes.push(self.src.as_ref().unwrap().to_string())
+        if self.width.is_some() {
+            attributes.push(self.width.as_ref().unwrap().to_string())
         }
         attributes
     }
@@ -97,6 +103,7 @@ pub struct AttrsBuilder {
     pub alt: Option<Alt>,
     pub href: Option<Href>,
     pub rel: Option<Rel>,
+    pub width: Option<Width>,
 }
 
 impl AttrsBuilder {
@@ -110,51 +117,61 @@ impl AttrsBuilder {
             alt: None,
             href: None,
             rel: None,
+            width: None,
         }
     }
 
     // region:    ===== Global Attributes ===== //
-    pub fn id(mut self, id: &'static str) -> Self {
-        self.id = Some(Id(id));
+    pub fn id(mut self, id: &str) -> Self {
+        self.id = Some(Id(id.to_owned()));
         self
     }
 
-    pub fn class(mut self, class: Vec<&'static str>) -> Self {
-        self.class = Some(Class(class));
+    pub fn class(mut self, class: Vec<&str>) -> Self {
+        let string_vec: Vec<String> = class
+            .iter()
+            .map(|&s| s.to_string()) // Convert each &str to String
+            .collect();
+        self.class = Some(Class(string_vec));
         self
     }
 
-    pub fn lang(mut self, lang: &'static str) -> Self {
-        self.lang = Some(Lang(lang));
+    pub fn lang(mut self, lang: &str) -> Self {
+        self.lang = Some(Lang(lang.to_owned()));
         self
     }
     // endregion: ===== Global Attributes ===== //
 
     // meta
-    pub fn charset(mut self, charset: &'static str) -> Self {
-        self.charset = Some(Charset(charset));
+    pub fn charset(mut self, charset: &str) -> Self {
+        self.charset = Some(Charset(charset.to_owned()));
         self
     }
 
     // region:    ===== img tag attributes ===== //
-    pub fn src(mut self, src: &'static str) -> Self {
-        self.src = Some(Src(src));
+    pub fn src(mut self, src: &str) -> Self {
+        self.src = Some(Src(src.to_owned()));
         self
     }
 
-    pub fn alt(mut self, alt: &'static str) -> Self {
-        self.alt = Some(Alt(alt));
+    pub fn alt(mut self, alt: &str) -> Self {
+        self.alt = Some(Alt(alt.to_owned()));
         self
     }
     // endregion: ===== img tag attributes ===== //
 
-    pub fn href(mut self, href: &'static str) -> Self {
-        self.href = Some(Href(href));
+    pub fn href(mut self, href: &str) -> Self {
+        self.href = Some(Href(href.to_owned()));
         self
     }
 
-    pub fn rel(mut self, rel: &'static str) -> Self {
-        self.rel = Some(Rel(rel));
+    pub fn rel(mut self, rel: &str) -> Self {
+        self.rel = Some(Rel(rel.to_owned()));
+        self
+    }
+
+    pub fn width(mut self, width: &str) -> Self {
+        self.width = Some(Width(width.to_owned()));
         self
     }
 
@@ -168,6 +185,7 @@ impl AttrsBuilder {
             alt: self.alt,
             href: self.href,
             rel: self.rel,
+            width: self.width,
         }
     }
 }
