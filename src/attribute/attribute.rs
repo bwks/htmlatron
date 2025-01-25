@@ -1,10 +1,11 @@
 use std::fmt::Display;
 
-use super::{Alt, Charset, Href, Id, Lang, Rel, Src, Width};
+use super::{Alt, Charset, Href, Id, Lang, Rel, Src, Width, Az};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
     Alt,
+    Az,
     Charset,
     Class,
     Href,
@@ -18,6 +19,7 @@ impl Display for Attr {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Attr::Alt => write!(f, "alt"),
+            Attr::Az => write!(f, "as"),
             Attr::Charset => write!(f, "charset"),
             Attr::Class => write!(f, "class"),
             Attr::Href => write!(f, "href"),
@@ -46,6 +48,7 @@ impl Display for Class {
 #[derive(Debug, Default, Clone)]
 pub struct Attrs {
     // Global
+    pub az: Option<Az>,
     pub id: Option<Id>,
     pub class: Option<Class>,
     pub lang: Option<Lang>,
@@ -65,6 +68,9 @@ impl Attrs {
         let mut attributes = vec![];
         if self.alt.is_some() {
             attributes.push(self.alt.as_ref().unwrap().to_string())
+        }
+        if self.az.is_some() {
+            attributes.push(self.az.as_ref().unwrap().to_string())
         }
         if self.charset.is_some() {
             attributes.push(self.charset.as_ref().unwrap().to_string())
@@ -100,6 +106,7 @@ pub struct AttrsBuilder {
     pub lang: Option<Lang>,
     pub charset: Option<Charset>,
     pub src: Option<Src>,
+    pub az: Option<Az>,
     pub alt: Option<Alt>,
     pub href: Option<Href>,
     pub rel: Option<Rel>,
@@ -114,6 +121,7 @@ impl AttrsBuilder {
             lang: None,
             charset: None,
             src: None,
+            az: None,
             alt: None,
             href: None,
             rel: None,
@@ -154,6 +162,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn az(mut self, az: &str) -> Self {
+        self.az = Some(Az(az.to_owned()));
+        self
+    }
+
     pub fn alt(mut self, alt: &str) -> Self {
         self.alt = Some(Alt(alt.to_owned()));
         self
@@ -182,6 +195,7 @@ impl AttrsBuilder {
             lang: self.lang,
             charset: self.charset,
             src: self.src,
+            az: self.az,
             alt: self.alt,
             href: self.href,
             rel: self.rel,

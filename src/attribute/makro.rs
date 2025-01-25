@@ -21,6 +21,7 @@ macro_rules! html_attribute {
 }
 
 // Usage
+html_attribute!(Az => Attr::Az);
 html_attribute!(Alt => Attr::Alt);
 html_attribute!(Charset => Attr::Charset);
 html_attribute!(Href => Attr::Href);

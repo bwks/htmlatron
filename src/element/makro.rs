@@ -2,20 +2,6 @@ use crate::attribute::Attrs;
 use crate::element::{Element, ElementBuilder};
 use crate::tag::Tags;
 
-// #[derive(Debug, Clone)]
-// pub struct H3 {
-//     pub attrs: Option<Attrs>,
-//     pub text: Option<String>,
-//     pub content: Option<String>,
-//     pub children: Option<Vec<Element>>,
-// }
-
-// impl H3 {
-//     pub fn new() -> ElementBuilder {
-//         ElementBuilder::new(Tags::H3)
-//     }
-// }
-
 #[macro_export]
 macro_rules! html_element {
     ($($name:ident => $tag:expr),*) => {
@@ -41,6 +27,7 @@ html_element! {
     A => Tags::A,
     Body => Tags::Body,
     Br => Tags::Br,
+    Code => Tags::Code,
     Comment => Tags::Comment,
     Div => Tags::Div,
     Footer => Tags::Footer,
@@ -50,8 +37,10 @@ html_element! {
     H4 => Tags::H4,
     H5 => Tags::H5,
     H6 => Tags::H6,
+    Head => Tags::Head,
     Header => Tags::Header,
     Html => Tags::Html,
+    I => Tags::I,
     Img => Tags::Img,
     Li => Tags::Li,
     Link => Tags::Link,
