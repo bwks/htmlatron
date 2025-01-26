@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::{Alt, Az, Charset, Href, Id, Lang, Rel, Src, Type, Width};
+use super::{Alt, Az, Charset, Href, Id, Lang, Rel, Src, Target, Type, Width};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
@@ -13,6 +13,7 @@ pub enum Attr {
     Id,
     Lang,
     Src,
+    Target,
     Type,
     Rel,
     Width,
@@ -29,6 +30,7 @@ impl Display for Attr {
             Attr::Id => write!(f, "id"),
             Attr::Lang => write!(f, "lang"),
             Attr::Src => write!(f, "src"),
+            Attr::Target => write!(f, "target"),
             Attr::Type => write!(f, "type"),
             Attr::Rel => write!(f, "rel"),
             Attr::Width => write!(f, "width"),
@@ -71,6 +73,7 @@ pub struct Attrs {
     pub lang: Option<Lang>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
+    pub target: Option<Target>,
     pub tipe: Option<Type>,
     pub width: Option<Width>,
 }
@@ -108,6 +111,9 @@ impl Attrs {
         if self.src.is_some() {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
+        if self.target.is_some() {
+            attributes.push(self.target.as_ref().unwrap().to_string())
+        }
         if self.tipe.is_some() {
             attributes.push(self.tipe.as_ref().unwrap().to_string())
         }
@@ -132,6 +138,7 @@ pub struct AttrsBuilder {
     pub lang: Option<Lang>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
+    pub target: Option<Target>,
     pub tipe: Option<Type>,
     pub width: Option<Width>,
 }
@@ -149,6 +156,7 @@ impl AttrsBuilder {
             lang: None,
             rel: None,
             src: None,
+            target: None,
             tipe: None,
             width: None,
         }
@@ -207,6 +215,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn target(mut self, target: &str) -> Self {
+        self.target = Some(Target(target.to_owned()));
+        self
+    }
+
     pub fn tipe(mut self, tipe: &str) -> Self {
         self.tipe = Some(Type(tipe.to_owned()));
         self
@@ -229,6 +242,7 @@ impl AttrsBuilder {
             lang: self.lang,
             rel: self.rel,
             src: self.src,
+            target: self.target,
             tipe: self.tipe,
             width: self.width,
         }

@@ -31,5 +31,6 @@ html_attribute!(Id => Attr::Id);
 html_attribute!(Lang => Attr::Lang);
 html_attribute!(Rel => Attr::Rel);
 html_attribute!(Src => Attr::Src);
+html_attribute!(Target => Attr::Target);
 html_attribute!(Type => Attr::Type);
 html_attribute!(Width => Attr::Width);
