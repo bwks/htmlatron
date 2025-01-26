@@ -20,6 +20,8 @@ macro_rules! html_attribute {
     };
 }
 
+// <link rel="shortcut icon" href="/favicon/favicon.ico" type="image/x-icon">
+
 // Usage
 html_attribute!(Az => Attr::Az);
 html_attribute!(Alt => Attr::Alt);
@@ -29,4 +31,5 @@ html_attribute!(Id => Attr::Id);
 html_attribute!(Lang => Attr::Lang);
 html_attribute!(Rel => Attr::Rel);
 html_attribute!(Src => Attr::Src);
+html_attribute!(Type => Attr::Type);
 html_attribute!(Width => Attr::Width);
