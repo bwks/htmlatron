@@ -1,17 +1,22 @@
 use std::fmt::Display;
 
-use super::{Alt, Az, Charset, Href, Id, Lang, Rel, Src, Target, Type, Width};
+use super::{
+    Alt, Az, Charset, Content, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type, Width,
+};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
     Alt,
     Az,
     Charset,
+    Content,
     Class,
     Defer,
     Href,
+    HttpEquiv,
     Id,
     Lang,
+    Name,
     Src,
     Target,
     Type,
@@ -24,11 +29,14 @@ impl Display for Attr {
             Attr::Alt => write!(f, "alt"),
             Attr::Az => write!(f, "as"),
             Attr::Charset => write!(f, "charset"),
+            Attr::Content => write!(f, "content"),
             Attr::Class => write!(f, "class"),
             Attr::Defer => write!(f, "defer"),
             Attr::Href => write!(f, "href"),
+            Attr::HttpEquiv => write!(f, "http-equiv"),
             Attr::Id => write!(f, "id"),
             Attr::Lang => write!(f, "lang"),
+            Attr::Name => write!(f, "name"),
             Attr::Src => write!(f, "src"),
             Attr::Target => write!(f, "target"),
             Attr::Type => write!(f, "type"),
@@ -68,9 +76,12 @@ pub struct Attrs {
     pub id: Option<Id>,
     pub class: Option<Class>,
     pub charset: Option<Charset>,
+    pub content: Option<Content>,
     pub defer: Option<Defer>,
     pub href: Option<Href>,
+    pub http_equiv: Option<HttpEquiv>,
     pub lang: Option<Lang>,
+    pub name: Option<Name>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
@@ -96,17 +107,26 @@ impl Attrs {
         if self.class.is_some() {
             attributes.push(self.class.as_ref().unwrap().to_string())
         }
+        if self.content.is_some() {
+            attributes.push(self.content.as_ref().unwrap().to_string())
+        }
         if self.defer.is_some() {
             attributes.push(self.defer.as_ref().unwrap().to_string())
         }
         if self.href.is_some() {
             attributes.push(self.href.as_ref().unwrap().to_string())
         }
+        if self.http_equiv.is_some() {
+            attributes.push(self.http_equiv.as_ref().unwrap().to_string())
+        }
         if self.id.is_some() {
             attributes.push(self.id.as_ref().unwrap().to_string())
         }
         if self.lang.is_some() {
             attributes.push(self.lang.as_ref().unwrap().to_string())
+        }
+        if self.name.is_some() {
+            attributes.push(self.name.as_ref().unwrap().to_string())
         }
         if self.src.is_some() {
             attributes.push(self.src.as_ref().unwrap().to_string())
@@ -132,10 +152,13 @@ pub struct AttrsBuilder {
     pub az: Option<Az>,
     pub charset: Option<Charset>,
     pub class: Option<Class>,
+    pub content: Option<Content>,
     pub defer: Option<Defer>,
     pub href: Option<Href>,
+    pub http_equiv: Option<HttpEquiv>,
     pub id: Option<Id>,
     pub lang: Option<Lang>,
+    pub name: Option<Name>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
@@ -150,10 +173,13 @@ impl AttrsBuilder {
             az: None,
             charset: None,
             class: None,
+            content: None,
             defer: None,
             href: None,
+            http_equiv: None,
             id: None,
             lang: None,
+            name: None,
             rel: None,
             src: None,
             target: None,
@@ -176,6 +202,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn content(mut self, content: &str) -> Self {
+        self.content = Some(Content(content.to_owned()));
+        self
+    }
+
     pub fn class(mut self, class: Vec<&str>) -> Self {
         let string_vec: Vec<String> = class
             .iter()
@@ -195,6 +226,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn http_equiv(mut self, http_equiv: &str) -> Self {
+        self.http_equiv = Some(HttpEquiv(http_equiv.to_owned()));
+        self
+    }
+
     pub fn id(mut self, id: &str) -> Self {
         self.id = Some(Id(id.to_owned()));
         self
@@ -202,6 +238,11 @@ impl AttrsBuilder {
 
     pub fn lang(mut self, lang: &str) -> Self {
         self.lang = Some(Lang(lang.to_owned()));
+        self
+    }
+
+    pub fn name(mut self, name: &str) -> Self {
+        self.name = Some(Name(name.to_owned()));
         self
     }
 
@@ -236,10 +277,13 @@ impl AttrsBuilder {
             az: self.az,
             charset: self.charset,
             class: self.class,
+            content: self.content,
             defer: self.defer,
             href: self.href,
+            http_equiv: self.http_equiv,
             id: self.id,
             lang: self.lang,
+            name: self.name,
             rel: self.rel,
             src: self.src,
             target: self.target,

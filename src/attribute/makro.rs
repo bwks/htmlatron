@@ -26,9 +26,12 @@ macro_rules! html_attribute {
 html_attribute!(Az => Attr::Az);
 html_attribute!(Alt => Attr::Alt);
 html_attribute!(Charset => Attr::Charset);
+html_attribute!(Content => Attr::Content);
 html_attribute!(Href => Attr::Href);
+html_attribute!(HttpEquiv => Attr::HttpEquiv);
 html_attribute!(Id => Attr::Id);
 html_attribute!(Lang => Attr::Lang);
+html_attribute!(Name => Attr::Name);
 html_attribute!(Rel => Attr::Rel);
 html_attribute!(Src => Attr::Src);
 html_attribute!(Target => Attr::Target);
