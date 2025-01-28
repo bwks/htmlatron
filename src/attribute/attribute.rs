@@ -187,30 +187,30 @@ impl AttrsBuilder {
             width: None,
         }
     }
-    pub fn alt(mut self, alt: &str) -> Self {
-        self.alt = Some(Alt(alt.to_owned()));
+    pub fn alt(mut self, alt: impl Into<String>) -> Self {
+        self.alt = Some(Alt(alt.into()));
         self
     }
 
-    pub fn az(mut self, az: &str) -> Self {
-        self.az = Some(Az(az.to_owned()));
+    pub fn az(mut self, az: impl Into<String>) -> Self {
+        self.az = Some(Az(az.into()));
         self
     }
 
-    pub fn charset(mut self, charset: &str) -> Self {
-        self.charset = Some(Charset(charset.to_owned()));
+    pub fn charset(mut self, charset: impl Into<String>) -> Self {
+        self.charset = Some(Charset(charset.into()));
         self
     }
 
-    pub fn content(mut self, content: &str) -> Self {
-        self.content = Some(Content(content.to_owned()));
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.content = Some(Content(content.into()));
         self
     }
 
-    pub fn class(mut self, class: Vec<&str>) -> Self {
+    pub fn class(mut self, class: Vec<impl Into<String>>) -> Self {
         let string_vec: Vec<String> = class
-            .iter()
-            .map(|&s| s.to_string()) // Convert each &str to String
+            .into_iter()
+            .map(|s| s.into()) // Convert each value to String
             .collect();
         self.class = Some(Class(string_vec));
         self
@@ -221,53 +221,53 @@ impl AttrsBuilder {
         self
     }
 
-    pub fn href(mut self, href: &str) -> Self {
-        self.href = Some(Href(href.to_owned()));
+    pub fn href(mut self, href: impl Into<String>) -> Self {
+        self.href = Some(Href(href.into()));
         self
     }
 
-    pub fn http_equiv(mut self, http_equiv: &str) -> Self {
-        self.http_equiv = Some(HttpEquiv(http_equiv.to_owned()));
+    pub fn http_equiv(mut self, http_equiv: impl Into<String>) -> Self {
+        self.http_equiv = Some(HttpEquiv(http_equiv.into()));
         self
     }
 
-    pub fn id(mut self, id: &str) -> Self {
-        self.id = Some(Id(id.to_owned()));
+    pub fn id(mut self, id: impl Into<String>) -> Self {
+        self.id = Some(Id(id.into()));
         self
     }
 
-    pub fn lang(mut self, lang: &str) -> Self {
-        self.lang = Some(Lang(lang.to_owned()));
+    pub fn lang(mut self, lang: impl Into<String>) -> Self {
+        self.lang = Some(Lang(lang.into()));
         self
     }
 
-    pub fn name(mut self, name: &str) -> Self {
-        self.name = Some(Name(name.to_owned()));
+    pub fn name(mut self, name: impl Into<String>) -> Self {
+        self.name = Some(Name(name.into()));
         self
     }
 
-    pub fn rel(mut self, rel: &str) -> Self {
-        self.rel = Some(Rel(rel.to_owned()));
+    pub fn rel(mut self, rel: impl Into<String>) -> Self {
+        self.rel = Some(Rel(rel.into()));
         self
     }
 
-    pub fn src(mut self, src: &str) -> Self {
-        self.src = Some(Src(src.to_owned()));
+    pub fn src(mut self, src: impl Into<String>) -> Self {
+        self.src = Some(Src(src.into()));
         self
     }
 
-    pub fn target(mut self, target: &str) -> Self {
-        self.target = Some(Target(target.to_owned()));
+    pub fn target(mut self, target: impl Into<String>) -> Self {
+        self.target = Some(Target(target.into()));
         self
     }
 
-    pub fn tipe(mut self, tipe: &str) -> Self {
-        self.tipe = Some(Type(tipe.to_owned()));
+    pub fn tipe(mut self, tipe: impl Into<String>) -> Self {
+        self.tipe = Some(Type(tipe.into()));
         self
     }
 
-    pub fn width(mut self, width: &str) -> Self {
-        self.width = Some(Width(width.to_owned()));
+    pub fn width(mut self, width: impl Into<String>) -> Self {
+        self.width = Some(Width(width.into()));
         self
     }
 

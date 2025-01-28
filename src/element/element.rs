@@ -33,14 +33,14 @@ impl ElementBuilder {
     // endregion: ===== a tag attributes ===== //
 
     // Text within a tag
-    pub fn text(mut self, text: &str) -> Self {
-        self.text = Some(text.to_owned());
+    pub fn text(mut self, text: impl Into<String>) -> Self {
+        self.text = Some(text.into());
         self
     }
 
     // Content within a opening and closing tags
-    pub fn content(mut self, content: &str) -> Self {
-        self.content = Some(content.to_owned());
+    pub fn content(mut self, content: impl Into<String>) -> Self {
+        self.content = Some(content.into());
         self
     }
 
