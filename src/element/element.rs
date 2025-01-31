@@ -121,13 +121,7 @@ impl Element {
 
         let close_tag = Element::close_tag(&self.tag);
 
-        // write!(f, r#"{open_tag}{content}{children}{close_tag}"#)
-        let fmt_str = format!(
-            r#"
-        {open_tag}{content}{children}{close_tag}
-        "#
-        );
-        fmt_str
+        format!(r#"{open_tag}{content}{children}{close_tag}"#)
     }
 
     // endregion: ===== Utility Methods ===== //
