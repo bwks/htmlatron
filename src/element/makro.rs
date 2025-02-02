@@ -54,6 +54,12 @@ html_element! {
     Pre => Tags::Pre,
     Script => Tags::Script,
     Span => Tags::Span,
+    Table => Tags::Table,
+    Thead => Tags::Thead,
+    Tbody => Tags::Tbody,
+    Th => Tags::Th,
+    Tr => Tags::Tr,
+    Td => Tags::Td,
     Title => Tags::Title,
     Ul => Tags::Ul
 }
