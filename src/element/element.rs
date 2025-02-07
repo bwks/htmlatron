@@ -26,7 +26,6 @@ impl ElementBuilder {
     // region:    ===== Global Attributes ===== //
     pub fn attrs(mut self, attrs: Attrs) -> Self {
         self.attrs = Some(attrs);
-
         self
     }
     // target
