@@ -25,6 +25,7 @@ macro_rules! html_element {
 
 html_element! {
     A => Tags::A,
+    B => Tags::B,
     Body => Tags::Body,
     Br => Tags::Br,
     Button => Tags::Button,
@@ -44,6 +45,7 @@ html_element! {
     I => Tags::I,
     Input => Tags::Input,
     Img => Tags::Img,
+    Kbd => Tags::Kbd,
     Label => Tags::Label,
     Li => Tags::Li,
     Link => Tags::Link,

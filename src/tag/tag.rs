@@ -3,6 +3,7 @@ use std::fmt::Display;
 #[derive(Debug, Clone, PartialEq)]
 pub enum Tags {
     A,
+    B,
     Body,
     Br,
     Button,
@@ -23,6 +24,7 @@ pub enum Tags {
     I,
     Input,
     Img,
+    Kbd,
     Label,
     Li,
     Link,
@@ -46,6 +48,7 @@ impl Display for Tags {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Tags::A => write!(f, "a"),
+            Tags::B => write!(f, "b"),
             Tags::Body => write!(f, "body"),
             Tags::Br => write!(f, "br"),
             Tags::Button => write!(f, "button"),
@@ -66,6 +69,7 @@ impl Display for Tags {
             Tags::Input => write!(f, "input"),
             Tags::I => write!(f, "i"),
             Tags::Img => write!(f, "img"),
+            Tags::Kbd => write!(f, "kbd"),
             Tags::Label => write!(f, "label"),
             Tags::Li => write!(f, "li"),
             Tags::Link => write!(f, "link"),
