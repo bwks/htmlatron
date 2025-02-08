@@ -1,5 +1,5 @@
-mod element;
+mod html_element;
 mod makro;
 
-pub use element::{Element, ElementBuilder};
+pub use html_element::{Element, ElementBuilder};
 pub use makro::*;

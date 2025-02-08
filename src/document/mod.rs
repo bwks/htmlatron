@@ -1,3 +1,3 @@
-mod document;
+mod html_document;
 
-pub use document::{Doctype, Document};
+pub use html_document::{Doctype, Document};

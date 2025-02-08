@@ -2,7 +2,7 @@ use std::fmt::Display;
 
 use log::warn;
 
-use crate::tag::Tags;
+use crate::tag::Tag;
 
 use super::{
     Alt, Az, Charset, Content, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type, Width,
@@ -163,13 +163,13 @@ impl Attrs {
     pub fn new() -> AttrsBuilder {
         AttrsBuilder::new()
     }
-    pub fn get_attrs(&self, tag: &Tags) -> Vec<String> {
+    pub fn get_attrs(&self, tag: &Tag) -> Vec<String> {
         let tag_attributes = match tag {
-            Tags::A => Attr::a(),
+            Tag::A => Attr::a(),
             _ => Attr::all().to_vec(),
         };
         let mut attributes = vec![];
-        if self.alt.is_some() && validate_attrs(&tag, &Attr::Alt, &tag_attributes) {
+        if self.alt.is_some() && validate_attrs(tag, &Attr::Alt, &tag_attributes) {
             attributes.push(self.alt.as_ref().unwrap().to_string())
         }
         if self.az.is_some() && tag_attributes.contains(&Attr::Az) {
@@ -239,7 +239,11 @@ pub struct AttrsBuilder {
     pub typ: Option<Type>,
     pub width: Option<Width>,
 }
-
+impl Default for AttrsBuilder {
+    fn default() -> Self {
+        Self::new()
+    }
+}
 impl AttrsBuilder {
     pub fn new() -> Self {
         AttrsBuilder {
@@ -367,8 +371,8 @@ impl AttrsBuilder {
     }
 }
 
-fn validate_attrs(tag: &Tags, attribute: &Attr, tag_attributes: &Vec<Attr>) -> bool {
-    match tag_attributes.contains(&attribute) {
+fn validate_attrs(tag: &Tag, attribute: &Attr, tag_attributes: &[Attr]) -> bool {
+    match tag_attributes.contains(attribute) {
         false => {
             warn!("HTML tag '{tag}' does not support the '{attribute}' attribute");
             false

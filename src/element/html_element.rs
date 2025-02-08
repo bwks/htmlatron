@@ -1,11 +1,11 @@
 use std::fmt::Display;
 
 use crate::attribute::Attrs;
-use crate::tag::Tags;
+use crate::tag::Tag;
 
 #[derive(Debug, Clone)]
 pub struct ElementBuilder {
-    pub tag: Tags,
+    pub tag: Tag,
     pub attrs: Option<Attrs>,
     pub text: Option<String>,
     pub content: Option<String>,
@@ -13,7 +13,7 @@ pub struct ElementBuilder {
 }
 
 impl ElementBuilder {
-    pub fn new(tag: Tags) -> Self {
+    pub fn new(tag: Tag) -> Self {
         ElementBuilder {
             tag,
             attrs: None,
@@ -38,13 +38,13 @@ impl ElementBuilder {
         self
     }
 
-    // Content within a opening and closing tags
+    // Content within a opening and closing tag
     pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(content.into());
         self
     }
 
-    // Nested tags
+    // Nested tag
     pub fn children(mut self, children: Vec<Element>) -> Self {
         self.children = Some(children);
         self
@@ -64,7 +64,7 @@ impl ElementBuilder {
 // blah
 #[derive(Debug, Clone)]
 pub struct Element {
-    pub tag: Tags,
+    pub tag: Tag,
     pub attrs: Option<Attrs>,
     pub text: Option<String>,
     pub content: Option<String>,
@@ -80,9 +80,9 @@ impl Display for Element {
 impl Element {
     // region:    ===== Utility Methods ===== //
 
-    pub fn open_tag(tag: &Tags, value: &String) -> String {
+    pub fn open_tag(tag: &Tag, value: &String) -> String {
         match tag {
-            Tags::Comment => format!("<!-- {} -->", value),
+            Tag::Comment => format!("<!-- {} -->", value),
             _ => {
                 if !value.is_empty() {
                     format!("<{} {}>", tag, value)
@@ -92,9 +92,9 @@ impl Element {
             }
         }
     }
-    pub fn close_tag(tag: &Tags) -> String {
+    pub fn close_tag(tag: &Tag) -> String {
         match tag {
-            Tags::Doctype | Tags::Meta | Tags::Comment | Tags::Br | Tags::Img => "".to_string(),
+            Tag::Doctype | Tag::Meta | Tag::Comment | Tag::Br | Tag::Img => "".to_string(),
             _ => format!("</{}>", tag),
         }
     }
@@ -114,7 +114,7 @@ impl Element {
         let open_tag = if !attributes.is_empty() {
             Element::open_tag(&self.tag, &attributes.join(" "))
         } else if self.text.is_some() {
-            Element::open_tag(&self.tag, &self.text.as_ref().unwrap())
+            Element::open_tag(&self.tag, self.text.as_ref().unwrap())
         } else {
             Element::open_tag(&self.tag, &"".to_string())
         };
