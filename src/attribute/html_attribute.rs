@@ -41,6 +41,7 @@ pub enum Attr {
     Charset,
     Content,
     Class,
+    Data,
     Defer,
     Href,
     HttpEquiv,
@@ -61,6 +62,7 @@ impl Display for Attr {
             Attr::Charset => write!(f, "charset"),
             Attr::Content => write!(f, "content"),
             Attr::Class => write!(f, "class"),
+            Attr::Data => write!(f, "data"),
             Attr::Defer => write!(f, "defer"),
             Attr::Href => write!(f, "href"),
             Attr::HttpEquiv => write!(f, "http-equiv"),
@@ -84,6 +86,7 @@ impl Attr {
             Attr::Class,
             Attr::Charset,
             Attr::Content,
+            Attr::Data,
             Attr::Defer,
             Attr::Href,
             Attr::HttpEquiv,
@@ -116,6 +119,17 @@ impl Attr {
     }
 }
 
+// HTML data-* attributes
+#[derive(Debug, Clone)]
+pub struct Data(pub String, pub String);
+
+impl Display for Data {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, r#"{}-{}="{}""#, Attr::Data, self.0, self.1)
+    }
+}
+
+// Boolean attributes
 #[derive(Debug, Clone)]
 pub struct Defer;
 
@@ -125,6 +139,7 @@ impl Display for Defer {
     }
 }
 
+// Vector Attributes
 #[derive(Debug, Clone)]
 pub struct Class(Vec<String>);
 
@@ -147,6 +162,7 @@ pub struct Attrs {
     pub class: Option<Class>,
     pub charset: Option<Charset>,
     pub content: Option<Content>,
+    pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
@@ -183,6 +199,9 @@ impl Attrs {
         }
         if self.content.is_some() && tag_attributes.contains(&Attr::Content) {
             attributes.push(self.content.as_ref().unwrap().to_string())
+        }
+        if self.data.is_some() && tag_attributes.contains(&Attr::Data) {
+            attributes.push(self.data.as_ref().unwrap().to_string())
         }
         if self.defer.is_some() && tag_attributes.contains(&Attr::Defer) {
             attributes.push(self.defer.as_ref().unwrap().to_string())
@@ -227,6 +246,7 @@ pub struct AttrsBuilder {
     pub charset: Option<Charset>,
     pub class: Option<Class>,
     pub content: Option<Content>,
+    pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
@@ -252,6 +272,7 @@ impl AttrsBuilder {
             charset: None,
             class: None,
             content: None,
+            data: None,
             defer: None,
             href: None,
             http_equiv: None,
@@ -291,6 +312,11 @@ impl AttrsBuilder {
             .map(|s| s.into()) // Convert each value to String
             .collect();
         self.class = Some(Class(string_vec));
+        self
+    }
+
+    pub fn data(mut self, key: impl Into<String>, value: impl Into<String>) -> Self {
+        self.data = Some(Data(key.into(), value.into()));
         self
     }
 
@@ -356,6 +382,7 @@ impl AttrsBuilder {
             charset: self.charset,
             class: self.class,
             content: self.content,
+            data: self.data,
             defer: self.defer,
             href: self.href,
             http_equiv: self.http_equiv,
