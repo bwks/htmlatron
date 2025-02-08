@@ -1,8 +1,38 @@
 use std::fmt::Display;
 
+use log::warn;
+
+use crate::tag::Tags;
+
 use super::{
     Alt, Az, Charset, Content, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type, Width,
 };
+
+#[derive(Debug, Clone, PartialEq)]
+pub enum LinkTarget {
+    Blank,
+    Parent,
+    Slf,
+    Top,
+    UnfencedTop,
+}
+impl Display for LinkTarget {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            LinkTarget::Blank => write!(f, "_blank"),
+            LinkTarget::Parent => write!(f, "_parent"),
+            LinkTarget::Slf => write!(f, "_self"),
+            LinkTarget::Top => write!(f, "_top"),
+            LinkTarget::UnfencedTop => write!(f, "_unfencedTop"),
+        }
+    }
+}
+
+impl From<LinkTarget> for String {
+    fn from(target: LinkTarget) -> Self {
+        target.to_string()
+    }
+}
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
@@ -45,6 +75,46 @@ impl Display for Attr {
         }
     }
 }
+impl Attr {
+    pub fn all() -> &'static [Attr] {
+        &[
+            Attr::Alt,
+            Attr::Az,
+            Attr::Id,
+            Attr::Class,
+            Attr::Charset,
+            Attr::Content,
+            Attr::Defer,
+            Attr::Href,
+            Attr::HttpEquiv,
+            Attr::Lang,
+            Attr::Name,
+            Attr::Rel,
+            Attr::Src,
+            Attr::Target,
+            Attr::Type,
+            Attr::Width,
+        ]
+    }
+    pub fn global() -> &'static [Attr] {
+        &[
+            //
+            Attr::Id,
+            Attr::Class,
+            Attr::Lang,
+        ]
+    }
+    pub fn a() -> Vec<Attr> {
+        let mut attrs = Attr::global().to_vec();
+        attrs.extend_from_slice(&[
+            //
+            Attr::Href,
+            Attr::Target,
+            Attr::Rel,
+        ]);
+        attrs
+    }
+}
 
 #[derive(Debug, Clone)]
 pub struct Defer;
@@ -85,7 +155,7 @@ pub struct Attrs {
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
-    pub tipe: Option<Type>,
+    pub typ: Option<Type>,
     pub width: Option<Width>,
 }
 
@@ -93,54 +163,58 @@ impl Attrs {
     pub fn new() -> AttrsBuilder {
         AttrsBuilder::new()
     }
-    pub fn get_attrs(&self) -> Vec<String> {
+    pub fn get_attrs(&self, tag: &Tags) -> Vec<String> {
+        let tag_attributes = match tag {
+            Tags::A => Attr::a(),
+            _ => Attr::all().to_vec(),
+        };
         let mut attributes = vec![];
-        if self.alt.is_some() {
+        if self.alt.is_some() && validate_attrs(&tag, &Attr::Alt, &tag_attributes) {
             attributes.push(self.alt.as_ref().unwrap().to_string())
         }
-        if self.az.is_some() {
+        if self.az.is_some() && tag_attributes.contains(&Attr::Az) {
             attributes.push(self.az.as_ref().unwrap().to_string())
         }
-        if self.charset.is_some() {
+        if self.charset.is_some() && tag_attributes.contains(&Attr::Charset) {
             attributes.push(self.charset.as_ref().unwrap().to_string())
         }
-        if self.class.is_some() {
+        if self.class.is_some() && tag_attributes.contains(&Attr::Class) {
             attributes.push(self.class.as_ref().unwrap().to_string())
         }
-        if self.content.is_some() {
+        if self.content.is_some() && tag_attributes.contains(&Attr::Content) {
             attributes.push(self.content.as_ref().unwrap().to_string())
         }
-        if self.defer.is_some() {
+        if self.defer.is_some() && tag_attributes.contains(&Attr::Defer) {
             attributes.push(self.defer.as_ref().unwrap().to_string())
         }
-        if self.href.is_some() {
+        if self.href.is_some() && tag_attributes.contains(&Attr::Href) {
             attributes.push(self.href.as_ref().unwrap().to_string())
         }
-        if self.http_equiv.is_some() {
+        if self.http_equiv.is_some() && tag_attributes.contains(&Attr::HttpEquiv) {
             attributes.push(self.http_equiv.as_ref().unwrap().to_string())
         }
-        if self.id.is_some() {
+        if self.id.is_some() && tag_attributes.contains(&Attr::Id) {
             attributes.push(self.id.as_ref().unwrap().to_string())
         }
-        if self.lang.is_some() {
+        if self.lang.is_some() && tag_attributes.contains(&Attr::Lang) {
             attributes.push(self.lang.as_ref().unwrap().to_string())
         }
-        if self.name.is_some() {
+        if self.name.is_some() && tag_attributes.contains(&Attr::Name) {
             attributes.push(self.name.as_ref().unwrap().to_string())
         }
-        if self.src.is_some() {
+        if self.src.is_some() && tag_attributes.contains(&Attr::Src) {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
-        if self.target.is_some() {
+        if self.target.is_some() && tag_attributes.contains(&Attr::Target) {
             attributes.push(self.target.as_ref().unwrap().to_string())
         }
-        if self.tipe.is_some() {
-            attributes.push(self.tipe.as_ref().unwrap().to_string())
+        if self.typ.is_some() && tag_attributes.contains(&Attr::Type) {
+            attributes.push(self.typ.as_ref().unwrap().to_string())
         }
-        if self.rel.is_some() {
+        if self.rel.is_some() && tag_attributes.contains(&Attr::Rel) {
             attributes.push(self.rel.as_ref().unwrap().to_string())
         }
-        if self.width.is_some() {
+        if self.width.is_some() && tag_attributes.contains(&Attr::Width) {
             attributes.push(self.width.as_ref().unwrap().to_string())
         }
         attributes
@@ -162,7 +236,7 @@ pub struct AttrsBuilder {
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
-    pub tipe: Option<Type>,
+    pub typ: Option<Type>,
     pub width: Option<Width>,
 }
 
@@ -183,7 +257,7 @@ impl AttrsBuilder {
             rel: None,
             src: None,
             target: None,
-            tipe: None,
+            typ: None,
             width: None,
         }
     }
@@ -256,13 +330,13 @@ impl AttrsBuilder {
         self
     }
 
-    pub fn target(mut self, target: impl Into<String>) -> Self {
+    pub fn target(mut self, target: LinkTarget) -> Self {
         self.target = Some(Target(target.into()));
         self
     }
 
-    pub fn tipe(mut self, tipe: impl Into<String>) -> Self {
-        self.tipe = Some(Type(tipe.into()));
+    pub fn typ(mut self, typ: impl Into<String>) -> Self {
+        self.typ = Some(Type(typ.into()));
         self
     }
 
@@ -287,8 +361,18 @@ impl AttrsBuilder {
             rel: self.rel,
             src: self.src,
             target: self.target,
-            tipe: self.tipe,
+            typ: self.typ,
             width: self.width,
         }
+    }
+}
+
+fn validate_attrs(tag: &Tags, attribute: &Attr, tag_attributes: &Vec<Attr>) -> bool {
+    match tag_attributes.contains(&attribute) {
+        false => {
+            warn!("HTML tag '{tag}' does not support the '{attribute}' attribute");
+            false
+        }
+        true => true,
     }
 }

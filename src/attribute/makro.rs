@@ -10,11 +10,7 @@ macro_rules! html_attribute {
 
         impl Display for $name {
             fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                match self {
-                    $name(value) => {
-                        write!(f, r#"{}="{}""#, $attr, value)
-                    }
-                }
+                write!(f, r#"{}="{}""#, $attr, self.0)
             }
         }
     };

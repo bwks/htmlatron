@@ -109,7 +109,7 @@ impl Element {
         });
 
         let attributes =
-            if let Some(attrs) = self.attrs.as_ref() { attrs.get_attrs() } else { vec![] };
+            if let Some(attrs) = self.attrs.as_ref() { attrs.get_attrs(&self.tag) } else { vec![] };
 
         let open_tag = if !attributes.is_empty() {
             Element::open_tag(&self.tag, &attributes.join(" "))
