@@ -5,3 +5,6 @@ edition = "2021"
 
 [dependencies]
 log = "0.4.25"
+
+[lints.clippy]
+new_ret_no_self = "allow"
