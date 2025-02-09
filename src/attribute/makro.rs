@@ -21,6 +21,7 @@ html_attributes!(Az => Attr::Az);
 html_attributes!(Alt => Attr::Alt);
 html_attributes!(Charset => Attr::Charset);
 html_attributes!(Content => Attr::Content);
+html_attributes!(Height => Attr::Height);
 html_attributes!(Href => Attr::Href);
 html_attributes!(HttpEquiv => Attr::HttpEquiv);
 html_attributes!(Id => Attr::Id);

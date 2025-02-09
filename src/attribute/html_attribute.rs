@@ -5,7 +5,8 @@ use log::warn;
 use crate::tag::Tag;
 
 use super::{
-    Alt, Az, Charset, Content, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type, Width,
+    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type,
+    Width,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -43,6 +44,7 @@ pub enum Attr {
     Class,
     Data,
     Defer,
+    Height,
     Href,
     HttpEquiv,
     Id,
@@ -64,6 +66,7 @@ impl Display for Attr {
             Attr::Class => write!(f, "class"),
             Attr::Data => write!(f, "data"),
             Attr::Defer => write!(f, "defer"),
+            Attr::Height => write!(f, "height"),
             Attr::Href => write!(f, "href"),
             Attr::HttpEquiv => write!(f, "http-equiv"),
             Attr::Id => write!(f, "id"),
@@ -88,6 +91,7 @@ impl Attr {
             Attr::Content,
             Attr::Data,
             Attr::Defer,
+            Attr::Height,
             Attr::Href,
             Attr::HttpEquiv,
             Attr::Lang,
@@ -164,6 +168,7 @@ pub struct Attrs {
     pub content: Option<Content>,
     pub data: Option<Data>,
     pub defer: Option<Defer>,
+    pub height: Option<Height>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
     pub lang: Option<Lang>,
@@ -205,6 +210,9 @@ impl Attrs {
         }
         if self.defer.is_some() && tag_attributes.contains(&Attr::Defer) {
             attributes.push(self.defer.as_ref().unwrap().to_string())
+        }
+        if self.height.is_some() && tag_attributes.contains(&Attr::Height) {
+            attributes.push(self.height.as_ref().unwrap().to_string())
         }
         if self.href.is_some() && tag_attributes.contains(&Attr::Href) {
             attributes.push(self.href.as_ref().unwrap().to_string())
@@ -248,6 +256,7 @@ pub struct AttrsBuilder {
     pub content: Option<Content>,
     pub data: Option<Data>,
     pub defer: Option<Defer>,
+    pub height: Option<Height>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
     pub id: Option<Id>,
@@ -274,6 +283,7 @@ impl AttrsBuilder {
             content: None,
             data: None,
             defer: None,
+            height: None,
             href: None,
             http_equiv: None,
             id: None,
@@ -322,6 +332,11 @@ impl AttrsBuilder {
 
     pub fn defer(mut self) -> Self {
         self.defer = Some(Defer);
+        self
+    }
+
+    pub fn height(mut self, height: impl Into<String>) -> Self {
+        self.height = Some(Height(height.into()));
         self
     }
 
@@ -384,6 +399,7 @@ impl AttrsBuilder {
             content: self.content,
             data: self.data,
             defer: self.defer,
+            height: self.height,
             href: self.href,
             http_equiv: self.http_equiv,
             id: self.id,
