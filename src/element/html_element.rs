@@ -78,12 +78,13 @@ impl Display for Element {
 }
 
 impl Element {
-    // region:    ===== Utility Methods ===== //
-
-    pub fn open_tag(tag: &Tag, value: &String) -> String {
+    // Create a HTML opening tag.
+    pub fn open_tag(tag: &Tag, value: impl Into<String>) -> String {
+        let value = value.into();
         match tag {
             Tag::Comment => format!("<!-- {} -->", value),
             _ => {
+                // let value = value.into();
                 if !value.is_empty() {
                     format!("<{} {}>", tag, value)
                 } else {
@@ -92,9 +93,12 @@ impl Element {
             }
         }
     }
+    // Create a HTML closing tag.
     pub fn close_tag(tag: &Tag) -> String {
         match tag {
+            // Void tags are self closing.
             Tag::Doctype | Tag::Meta | Tag::Comment | Tag::Br | Tag::Img => "".to_string(),
+            // All other tags have a corresponding closing tag
             _ => format!("</{}>", tag),
         }
     }
@@ -112,17 +116,15 @@ impl Element {
             if let Some(attrs) = self.attrs.as_ref() { attrs.get_attrs(&self.tag) } else { vec![] };
 
         let open_tag = if !attributes.is_empty() {
-            Element::open_tag(&self.tag, &attributes.join(" "))
+            Element::open_tag(&self.tag, attributes.join(" "))
         } else if self.text.is_some() {
             Element::open_tag(&self.tag, self.text.as_ref().unwrap())
         } else {
-            Element::open_tag(&self.tag, &"".to_string())
+            Element::open_tag(&self.tag, "")
         };
 
         let close_tag = Element::close_tag(&self.tag);
 
         format!(r#"{open_tag}{content}{children}{close_tag}"#)
     }
-
-    // endregion: ===== Utility Methods ===== //
 }

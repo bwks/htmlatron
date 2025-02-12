@@ -111,16 +111,6 @@ impl Attr {
             Attr::Lang,
         ]
     }
-    pub fn a() -> Vec<Attr> {
-        let mut attrs = Attr::global().to_vec();
-        attrs.extend_from_slice(&[
-            //
-            Attr::Href,
-            Attr::Target,
-            Attr::Rel,
-        ]);
-        attrs
-    }
 }
 
 // HTML data-* attributes
@@ -185,10 +175,7 @@ impl Attrs {
         AttrsBuilder::new()
     }
     pub fn get_attrs(&self, tag: &Tag) -> Vec<String> {
-        let tag_attributes = match tag {
-            Tag::A => Attr::a(),
-            _ => Attr::all().to_vec(),
-        };
+        let tag_attributes = Tag::attributes(tag);
         let mut attributes = vec![];
         if self.alt.is_some() && validate_attrs(tag, &Attr::Alt, &tag_attributes) {
             attributes.push(self.alt.as_ref().unwrap().to_string())
@@ -414,12 +401,12 @@ impl AttrsBuilder {
     }
 }
 
-fn validate_attrs(tag: &Tag, attribute: &Attr, tag_attributes: &[Attr]) -> bool {
-    match tag_attributes.contains(attribute) {
-        false => {
-            warn!("HTML tag '{tag}' does not support the '{attribute}' attribute");
-            false
-        }
-        true => true,
+// Check if the attributes supplied are valid for the HTML tag variant.
+fn validate_attrs(tag: &Tag, check_attribute: &Attr, valid_attributes: &[Attr]) -> bool {
+    if valid_attributes.contains(check_attribute) {
+        true
+    } else {
+        warn!("HTML tag '{tag}' does not support the '{check_attribute}' attribute");
+        false
     }
 }
