@@ -96,7 +96,7 @@ impl Tag {
     pub fn attributes(tag: &Tag) -> Vec<Attr> {
         match tag {
             // Elements that support global attributes only.
-            Tag::B | Tag::Body | Tag::Button | Tag::Code => Attr::global().to_vec(),
+            Tag::B | Tag::Body | Tag::Code => Attr::global().to_vec(),
             Tag::A => {
                 let mut attrs = Attr::global().to_vec();
                 attrs.extend_from_slice(&[
@@ -107,7 +107,16 @@ impl Tag {
                 ]);
                 attrs
             }
-            _ => Attr::global().to_vec(),
+            Tag::Button => {
+                let mut attrs = Attr::global().to_vec();
+                attrs.extend_from_slice(&[
+                    //
+                    Attr::Type,
+                    Attr::Data,
+                ]);
+                attrs
+            }
+            _ => Attr::all().to_vec(),
         }
     }
 }

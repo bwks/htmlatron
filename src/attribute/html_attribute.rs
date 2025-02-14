@@ -108,6 +108,7 @@ impl Attr {
             //
             Attr::Id,
             Attr::Class,
+            Attr::Data,
             Attr::Lang,
         ]
     }
@@ -177,58 +178,59 @@ impl Attrs {
     pub fn get_attrs(&self, tag: &Tag) -> Vec<String> {
         let tag_attributes = Tag::attributes(tag);
         let mut attributes = vec![];
+
         if self.alt.is_some() && validate_attrs(tag, &Attr::Alt, &tag_attributes) {
             attributes.push(self.alt.as_ref().unwrap().to_string())
         }
-        if self.az.is_some() && tag_attributes.contains(&Attr::Az) {
+        if self.az.is_some() && validate_attrs(tag, &Attr::Az, &tag_attributes) {
             attributes.push(self.az.as_ref().unwrap().to_string())
         }
-        if self.charset.is_some() && tag_attributes.contains(&Attr::Charset) {
+        if self.charset.is_some() && validate_attrs(tag, &Attr::Charset, &tag_attributes) {
             attributes.push(self.charset.as_ref().unwrap().to_string())
         }
-        if self.class.is_some() && tag_attributes.contains(&Attr::Class) {
+        if self.class.is_some() && validate_attrs(tag, &Attr::Class, &tag_attributes) {
             attributes.push(self.class.as_ref().unwrap().to_string())
         }
-        if self.content.is_some() && tag_attributes.contains(&Attr::Content) {
+        if self.content.is_some() && validate_attrs(tag, &Attr::Content, &tag_attributes) {
             attributes.push(self.content.as_ref().unwrap().to_string())
         }
-        if self.data.is_some() && tag_attributes.contains(&Attr::Data) {
+        if self.data.is_some() && validate_attrs(tag, &Attr::Data, &tag_attributes) {
             attributes.push(self.data.as_ref().unwrap().to_string())
         }
-        if self.defer.is_some() && tag_attributes.contains(&Attr::Defer) {
+        if self.defer.is_some() && validate_attrs(tag, &Attr::Defer, &tag_attributes) {
             attributes.push(self.defer.as_ref().unwrap().to_string())
         }
-        if self.height.is_some() && tag_attributes.contains(&Attr::Height) {
+        if self.height.is_some() && validate_attrs(tag, &Attr::Height, &tag_attributes) {
             attributes.push(self.height.as_ref().unwrap().to_string())
         }
-        if self.href.is_some() && tag_attributes.contains(&Attr::Href) {
+        if self.href.is_some() && validate_attrs(tag, &Attr::Href, &tag_attributes) {
             attributes.push(self.href.as_ref().unwrap().to_string())
         }
-        if self.http_equiv.is_some() && tag_attributes.contains(&Attr::HttpEquiv) {
+        if self.http_equiv.is_some() && validate_attrs(tag, &Attr::HttpEquiv, &tag_attributes) {
             attributes.push(self.http_equiv.as_ref().unwrap().to_string())
         }
-        if self.id.is_some() && tag_attributes.contains(&Attr::Id) {
+        if self.id.is_some() && validate_attrs(tag, &Attr::Id, &tag_attributes) {
             attributes.push(self.id.as_ref().unwrap().to_string())
         }
-        if self.lang.is_some() && tag_attributes.contains(&Attr::Lang) {
+        if self.lang.is_some() && validate_attrs(tag, &Attr::Lang, &tag_attributes) {
             attributes.push(self.lang.as_ref().unwrap().to_string())
         }
-        if self.name.is_some() && tag_attributes.contains(&Attr::Name) {
+        if self.name.is_some() && validate_attrs(tag, &Attr::Name, &tag_attributes) {
             attributes.push(self.name.as_ref().unwrap().to_string())
         }
-        if self.src.is_some() && tag_attributes.contains(&Attr::Src) {
+        if self.src.is_some() && validate_attrs(tag, &Attr::Src, &tag_attributes) {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
-        if self.target.is_some() && tag_attributes.contains(&Attr::Target) {
+        if self.target.is_some() && validate_attrs(tag, &Attr::Target, &tag_attributes) {
             attributes.push(self.target.as_ref().unwrap().to_string())
         }
-        if self.typ.is_some() && tag_attributes.contains(&Attr::Type) {
+        if self.typ.is_some() && validate_attrs(tag, &Attr::Type, &tag_attributes) {
             attributes.push(self.typ.as_ref().unwrap().to_string())
         }
-        if self.rel.is_some() && tag_attributes.contains(&Attr::Rel) {
+        if self.rel.is_some() && validate_attrs(tag, &Attr::Rel, &tag_attributes) {
             attributes.push(self.rel.as_ref().unwrap().to_string())
         }
-        if self.width.is_some() && tag_attributes.contains(&Attr::Width) {
+        if self.width.is_some() && validate_attrs(tag, &Attr::Width, &tag_attributes) {
             attributes.push(self.width.as_ref().unwrap().to_string())
         }
         attributes
@@ -304,10 +306,7 @@ impl AttrsBuilder {
     }
 
     pub fn class(mut self, class: Vec<impl Into<String>>) -> Self {
-        let string_vec: Vec<String> = class
-            .into_iter()
-            .map(|s| s.into()) // Convert each value to String
-            .collect();
+        let string_vec: Vec<String> = class.into_iter().map(|s| s.into()).collect();
         self.class = Some(Class(string_vec));
         self
     }
