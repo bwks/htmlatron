@@ -112,7 +112,6 @@ impl Tag {
                 attrs.extend_from_slice(&[
                     //
                     Attr::Type,
-                    Attr::Data,
                 ]);
                 attrs
             }
