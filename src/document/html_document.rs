@@ -16,7 +16,7 @@ impl Display for Doctype {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub struct Document {
     pub doctype: Doctype,
     pub elements: Vec<Element>,
