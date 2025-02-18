@@ -1,6 +1,6 @@
 use std::fmt::Display;
 
-use super::html_attribute::Attr;
+use super::html::Attr;
 
 #[macro_export]
 macro_rules! html_attributes {

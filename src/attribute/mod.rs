@@ -1,5 +1,5 @@
-mod html_attribute;
+mod html;
 mod makro;
 
-pub use html_attribute::{Attr, Attrs, LinkTarget};
+pub use html::{Attr, Attrs, LinkTarget};
 pub use makro::*;
