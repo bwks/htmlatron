@@ -102,8 +102,9 @@ impl Tag {
                 attrs.extend_from_slice(&[
                     //
                     Attr::Href,
-                    Attr::Target,
+                    Attr::Onclick,
                     Attr::Rel,
+                    Attr::Target,
                 ]);
                 attrs
             }
