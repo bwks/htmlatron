@@ -5,8 +5,8 @@ use log::warn;
 use crate::tag::Tag;
 
 use super::{
-    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Target, Type,
-    Width,
+    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Tabindex, Target,
+    Type, Width,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -51,6 +51,7 @@ pub enum Attr {
     Lang,
     Name,
     Src,
+    Tabindex,
     Target,
     Type,
     Rel,
@@ -73,6 +74,7 @@ impl Display for Attr {
             Attr::Lang => write!(f, "lang"),
             Attr::Name => write!(f, "name"),
             Attr::Src => write!(f, "src"),
+            Attr::Tabindex => write!(f, "tabindex"),
             Attr::Target => write!(f, "target"),
             Attr::Type => write!(f, "type"),
             Attr::Rel => write!(f, "rel"),
@@ -98,6 +100,7 @@ impl Attr {
             Attr::Name,
             Attr::Rel,
             Attr::Src,
+            Attr::Tabindex,
             Attr::Target,
             Attr::Type,
             Attr::Width,
@@ -110,6 +113,7 @@ impl Attr {
             Attr::Class,
             Attr::Data,
             Attr::Lang,
+            Attr::Tabindex,
         ]
     }
 }
@@ -166,6 +170,7 @@ pub struct Attrs {
     pub name: Option<Name>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
+    pub tabindex: Option<Tabindex>,
     pub target: Option<Target>,
     pub typ: Option<Type>,
     pub width: Option<Width>,
@@ -221,6 +226,9 @@ impl Attrs {
         if self.src.is_some() && validate_attrs(tag, &Attr::Src, &tag_attributes) {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
+        if self.tabindex.is_some() && validate_attrs(tag, &Attr::Tabindex, &tag_attributes) {
+            attributes.push(self.tabindex.as_ref().unwrap().to_string())
+        }
         if self.target.is_some() && validate_attrs(tag, &Attr::Target, &tag_attributes) {
             attributes.push(self.target.as_ref().unwrap().to_string())
         }
@@ -254,6 +262,7 @@ pub struct AttrsBuilder {
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
+    pub tabindex: Option<Tabindex>,
     pub typ: Option<Type>,
     pub width: Option<Width>,
 }
@@ -280,6 +289,7 @@ impl AttrsBuilder {
             name: None,
             rel: None,
             src: None,
+            tabindex: None,
             target: None,
             typ: None,
             width: None,
@@ -361,6 +371,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn tabindex(mut self, tabindex: i16) -> Self {
+        self.tabindex = Some(Tabindex(tabindex.to_string()));
+        self
+    }
+
     pub fn target(mut self, target: LinkTarget) -> Self {
         self.target = Some(Target(target.into()));
         self
@@ -393,6 +408,7 @@ impl AttrsBuilder {
             name: self.name,
             rel: self.rel,
             src: self.src,
+            tabindex: self.tabindex,
             target: self.target,
             typ: self.typ,
             width: self.width,

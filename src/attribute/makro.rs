@@ -29,6 +29,7 @@ html_attributes!(Lang => Attr::Lang);
 html_attributes!(Name => Attr::Name);
 html_attributes!(Rel => Attr::Rel);
 html_attributes!(Src => Attr::Src);
+html_attributes!(Tabindex => Attr::Tabindex);
 html_attributes!(Target => Attr::Target);
 html_attributes!(Type => Attr::Type);
 html_attributes!(Width => Attr::Width);
