@@ -27,6 +27,7 @@ html_attributes!(HttpEquiv => Attr::HttpEquiv);
 html_attributes!(Id => Attr::Id);
 html_attributes!(Lang => Attr::Lang);
 html_attributes!(Name => Attr::Name);
+html_attributes!(Onclick => Attr::Onclick);
 html_attributes!(Rel => Attr::Rel);
 html_attributes!(Src => Attr::Src);
 html_attributes!(Tabindex => Attr::Tabindex);

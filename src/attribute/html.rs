@@ -5,8 +5,8 @@ use log::warn;
 use crate::tag::Tag;
 
 use super::{
-    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Rel, Src, Tabindex, Target,
-    Type, Width,
+    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Onclick, Rel, Src,
+    Tabindex, Target, Type, Width,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -50,6 +50,7 @@ pub enum Attr {
     Id,
     Lang,
     Name,
+    Onclick,
     Src,
     Tabindex,
     Target,
@@ -73,6 +74,7 @@ impl Display for Attr {
             Attr::Id => write!(f, "id"),
             Attr::Lang => write!(f, "lang"),
             Attr::Name => write!(f, "name"),
+            Attr::Onclick => write!(f, "onclick"),
             Attr::Src => write!(f, "src"),
             Attr::Tabindex => write!(f, "tabindex"),
             Attr::Target => write!(f, "target"),
@@ -98,6 +100,7 @@ impl Attr {
             Attr::HttpEquiv,
             Attr::Lang,
             Attr::Name,
+            Attr::Onclick,
             Attr::Rel,
             Attr::Src,
             Attr::Tabindex,
@@ -168,6 +171,7 @@ pub struct Attrs {
     pub http_equiv: Option<HttpEquiv>,
     pub lang: Option<Lang>,
     pub name: Option<Name>,
+    pub onclick: Option<Onclick>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub tabindex: Option<Tabindex>,
@@ -223,6 +227,9 @@ impl Attrs {
         if self.name.is_some() && validate_attrs(tag, &Attr::Name, &tag_attributes) {
             attributes.push(self.name.as_ref().unwrap().to_string())
         }
+        if self.onclick.is_some() && validate_attrs(tag, &Attr::Onclick, &tag_attributes) {
+            attributes.push(self.onclick.as_ref().unwrap().to_string())
+        }
         if self.src.is_some() && validate_attrs(tag, &Attr::Src, &tag_attributes) {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
@@ -259,6 +266,7 @@ pub struct AttrsBuilder {
     pub id: Option<Id>,
     pub lang: Option<Lang>,
     pub name: Option<Name>,
+    pub onclick: Option<Onclick>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
     pub target: Option<Target>,
@@ -287,6 +295,7 @@ impl AttrsBuilder {
             id: None,
             lang: None,
             name: None,
+            onclick: None,
             rel: None,
             src: None,
             tabindex: None,
@@ -361,6 +370,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn onclick(mut self, onclick: impl Into<String>) -> Self {
+        self.onclick = Some(Onclick(onclick.into()));
+        self
+    }
+
     pub fn rel(mut self, rel: impl Into<String>) -> Self {
         self.rel = Some(Rel(rel.into()));
         self
@@ -406,6 +420,7 @@ impl AttrsBuilder {
             id: self.id,
             lang: self.lang,
             name: self.name,
+            onclick: self.onclick,
             rel: self.rel,
             src: self.src,
             tabindex: self.tabindex,
