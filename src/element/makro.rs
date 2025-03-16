@@ -54,6 +54,7 @@ html_element! {
     Ol => Tag::Ol,
     P => Tag::P,
     Pre => Tag::Pre,
+    Q => Tag::Q,
     Script => Tag::Script,
     Span => Tag::Span,
     Table => Tag::Table,
