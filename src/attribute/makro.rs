@@ -3,7 +3,7 @@ use std::fmt::Display;
 use super::html::Attr;
 
 #[macro_export]
-macro_rules! html_attributes {
+macro_rules! html_attribute {
     ($name:ident => $attr:expr) => {
         #[derive(Debug, Clone)]
         pub struct $name(pub String);
@@ -17,20 +17,20 @@ macro_rules! html_attributes {
 }
 
 // Usage
-html_attributes!(Az => Attr::Az);
-html_attributes!(Alt => Attr::Alt);
-html_attributes!(Charset => Attr::Charset);
-html_attributes!(Content => Attr::Content);
-html_attributes!(Height => Attr::Height);
-html_attributes!(Href => Attr::Href);
-html_attributes!(HttpEquiv => Attr::HttpEquiv);
-html_attributes!(Id => Attr::Id);
-html_attributes!(Lang => Attr::Lang);
-html_attributes!(Name => Attr::Name);
-html_attributes!(Onclick => Attr::Onclick);
-html_attributes!(Rel => Attr::Rel);
-html_attributes!(Src => Attr::Src);
-html_attributes!(Tabindex => Attr::Tabindex);
-html_attributes!(Target => Attr::Target);
-html_attributes!(Type => Attr::Type);
-html_attributes!(Width => Attr::Width);
+html_attribute!(Az => Attr::Az);
+html_attribute!(Alt => Attr::Alt);
+html_attribute!(Charset => Attr::Charset);
+html_attribute!(Content => Attr::Content);
+html_attribute!(Height => Attr::Height);
+html_attribute!(Href => Attr::Href);
+html_attribute!(HttpEquiv => Attr::HttpEquiv);
+html_attribute!(Id => Attr::Id);
+html_attribute!(Lang => Attr::Lang);
+html_attribute!(Name => Attr::Name);
+html_attribute!(Onclick => Attr::Onclick);
+html_attribute!(Rel => Attr::Rel);
+html_attribute!(Src => Attr::Src);
+html_attribute!(Tabindex => Attr::Tabindex);
+html_attribute!(Target => Attr::Target);
+html_attribute!(Type => Attr::Type);
+html_attribute!(Width => Attr::Width);

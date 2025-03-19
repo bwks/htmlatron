@@ -1,3 +1,3 @@
-mod html_tag;
+mod html;
 
-pub use html_tag::Tag;
+pub use html::Tag;

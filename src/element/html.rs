@@ -23,14 +23,11 @@ impl ElementBuilder {
         }
     }
 
-    // region:    ===== Global Attributes ===== //
+    // Tag attributes
     pub fn attrs(mut self, attrs: Attrs) -> Self {
         self.attrs = Some(attrs);
         self
     }
-    // target
-
-    // endregion: ===== a tag attributes ===== //
 
     // Text within a tag
     pub fn text(mut self, text: impl Into<String>) -> Self {
@@ -44,7 +41,7 @@ impl ElementBuilder {
         self
     }
 
-    // Nested tag
+    // Nested tag within a tag
     pub fn children(mut self, children: Vec<Element>) -> Self {
         self.children = Some(children);
         self
