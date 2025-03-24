@@ -57,6 +57,7 @@ html_element! {
     Q => Tag::Q,
     Script => Tag::Script,
     Span => Tag::Span,
+    Strong => Tag::Strong,
     Table => Tag::Table,
     Thead => Tag::Thead,
     Tbody => Tag::Tbody,
