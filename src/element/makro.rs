@@ -32,6 +32,7 @@ html_element! {
     Code => Tag::Code,
     Comment => Tag::Comment,
     Div => Tag::Div,
+    Em => Tag::Em,
     Footer => Tag::Footer,
     H1 => Tag::H1,
     H2 => Tag::H2,
