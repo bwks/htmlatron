@@ -5,7 +5,7 @@ use log::warn;
 use crate::tag::Tag;
 
 use super::{
-    Alt, Az, Charset, Content, Height, Href, HttpEquiv, Id, Lang, Name, Onclick, Rel, Src,
+    Alt, Az, Charset, Content, Height, Hidden, Href, HttpEquiv, Id, Lang, Name, Onclick, Rel, Src,
     Tabindex, Target, Type, Width,
 };
 
@@ -35,6 +35,24 @@ impl From<LinkTarget> for String {
     }
 }
 
+pub enum HiddenOptions {
+    Hidden,
+    UntilFound,
+}
+impl Display for HiddenOptions {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            HiddenOptions::Hidden => write!(f, "hidden"),
+            HiddenOptions::UntilFound => write!(f, "until-found"),
+        }
+    }
+}
+impl From<HiddenOptions> for String {
+    fn from(option: HiddenOptions) -> Self {
+        option.to_string()
+    }
+}
+
 #[derive(Debug, Clone, PartialEq)]
 pub enum Attr {
     Alt,
@@ -45,6 +63,7 @@ pub enum Attr {
     Data,
     Defer,
     Height,
+    Hidden,
     Href,
     HttpEquiv,
     Id,
@@ -69,6 +88,7 @@ impl Display for Attr {
             Attr::Data => write!(f, "data"),
             Attr::Defer => write!(f, "defer"),
             Attr::Height => write!(f, "height"),
+            Attr::Hidden => write!(f, "hidden"),
             Attr::Href => write!(f, "href"),
             Attr::HttpEquiv => write!(f, "http-equiv"),
             Attr::Id => write!(f, "id"),
@@ -115,6 +135,7 @@ impl Attr {
             Attr::Id,
             Attr::Class,
             Attr::Data,
+            Attr::Hidden,
             Attr::Lang,
             Attr::Tabindex,
         ]
@@ -167,6 +188,7 @@ pub struct Attrs {
     pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub height: Option<Height>,
+    pub hidden: Option<Hidden>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
     pub lang: Option<Lang>,
@@ -261,6 +283,7 @@ pub struct AttrsBuilder {
     pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub height: Option<Height>,
+    pub hidden: Option<Hidden>,
     pub href: Option<Href>,
     pub http_equiv: Option<HttpEquiv>,
     pub id: Option<Id>,
@@ -290,6 +313,7 @@ impl AttrsBuilder {
             data: None,
             defer: None,
             height: None,
+            hidden: None,
             href: None,
             http_equiv: None,
             id: None,
@@ -342,6 +366,11 @@ impl AttrsBuilder {
 
     pub fn height(mut self, height: impl Into<String>) -> Self {
         self.height = Some(Height(height.into()));
+        self
+    }
+
+    pub fn hidden(mut self, hidden: HiddenOptions) -> Self {
+        self.hidden = Some(Hidden(hidden.into()));
         self
     }
 
@@ -415,6 +444,7 @@ impl AttrsBuilder {
             data: self.data,
             defer: self.defer,
             height: self.height,
+            hidden: self.hidden,
             href: self.href,
             http_equiv: self.http_equiv,
             id: self.id,
