@@ -116,6 +116,7 @@ impl Attr {
             Attr::Data,
             Attr::Defer,
             Attr::Height,
+            Attr::Hidden,
             Attr::Href,
             Attr::HttpEquiv,
             Attr::Lang,
