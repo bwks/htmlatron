@@ -35,20 +35,20 @@ impl From<LinkTarget> for String {
     }
 }
 
-pub enum HiddenOptions {
+pub enum HiddenValue {
     Hidden,
     UntilFound,
 }
-impl Display for HiddenOptions {
+impl Display for HiddenValue {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-            HiddenOptions::Hidden => write!(f, "hidden"),
-            HiddenOptions::UntilFound => write!(f, "until-found"),
+            HiddenValue::Hidden => write!(f, "hidden"),
+            HiddenValue::UntilFound => write!(f, "until-found"),
         }
     }
 }
-impl From<HiddenOptions> for String {
-    fn from(option: HiddenOptions) -> Self {
+impl From<HiddenValue> for String {
+    fn from(option: HiddenValue) -> Self {
         option.to_string()
     }
 }
@@ -369,7 +369,7 @@ impl AttrsBuilder {
         self
     }
 
-    pub fn hidden(mut self, hidden: HiddenOptions) -> Self {
+    pub fn hidden(mut self, hidden: HiddenValue) -> Self {
         self.hidden = Some(Hidden(hidden.into()));
         self
     }
