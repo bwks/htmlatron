@@ -234,6 +234,9 @@ impl Attrs {
         if self.height.is_some() && validate_attrs(tag, &Attr::Height, &tag_attributes) {
             attributes.push(self.height.as_ref().unwrap().to_string())
         }
+        if self.hidden.is_some() && validate_attrs(tag, &Attr::Hidden, &tag_attributes) {
+            attributes.push(self.hidden.as_ref().unwrap().to_string())
+        }
         if self.href.is_some() && validate_attrs(tag, &Attr::Href, &tag_attributes) {
             attributes.push(self.href.as_ref().unwrap().to_string())
         }
