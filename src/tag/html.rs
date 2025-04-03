@@ -126,3 +126,56 @@ impl Tag {
         }
     }
 }
+
+// ...existing code...
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_tag_display() {
+        assert_eq!(Tag::A.to_string(), "a");
+        assert_eq!(Tag::Div.to_string(), "div");
+        assert_eq!(Tag::Doctype.to_string(), "!DOCTYPE");
+        assert_eq!(Tag::Comment.to_string(), "!--");
+    }
+
+    // #[test]
+    // fn test_global_attributes() {
+    //     let global_attrs = vec![Attr::Az, Attr::Hidden, Attr::Id, Attr::Lang, Attr::Tabindex];
+
+    //     // Test tags that should only have global attributes
+    //     let b_attrs = Tag::attributes(&Tag::B);
+    //     let body_attrs = Tag::attributes(&Tag::Body);
+    //     let code_attrs = Tag::attributes(&Tag::Code);
+
+    //     assert_eq!(b_attrs, global_attrs);
+    //     assert_eq!(body_attrs, global_attrs);
+    //     assert_eq!(code_attrs, global_attrs);
+    // }
+
+    #[test]
+    fn test_a_tag_attributes() {
+        let mut expected = Attr::global().to_vec();
+        expected.extend_from_slice(&[Attr::Href, Attr::Onclick, Attr::Rel, Attr::Target]);
+
+        assert_eq!(Tag::attributes(&Tag::A), expected);
+    }
+
+    #[test]
+    fn test_button_tag_attributes() {
+        let mut expected = Attr::global().to_vec();
+        expected.extend_from_slice(&[Attr::Type]);
+
+        assert_eq!(Tag::attributes(&Tag::Button), expected);
+    }
+
+    #[test]
+    fn test_default_attributes() {
+        // Test a tag that falls into the default case
+        let all_attrs = Attr::all().to_vec();
+        assert_eq!(Tag::attributes(&Tag::Div), all_attrs);
+        assert_eq!(Tag::attributes(&Tag::Span), all_attrs);
+    }
+}

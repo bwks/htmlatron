@@ -125,3 +125,90 @@ impl Element {
         format!(r#"{open_tag}{content}{children}{close_tag}"#)
     }
 }
+
+// ...existing code...
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::prelude::*;
+
+    #[test]
+    fn test_element_builder() {
+        let element = ElementBuilder::new(Tag::Div)
+            .attrs(Attrs::new().id("test-id").build())
+            .text("Hello")
+            .build();
+
+        assert_eq!(element.tag, Tag::Div);
+        assert!(element.attrs.is_some());
+        assert_eq!(element.text.unwrap(), "Hello");
+    }
+
+    #[test]
+    fn test_void_elements() {
+        let br = Element {
+            tag: Tag::Br,
+            attrs: None,
+            text: None,
+            content: None,
+            children: None,
+        };
+        assert_eq!(br.to_string(), "<br>");
+
+        let img = ElementBuilder::new(Tag::Img)
+            .attrs(Attrs::new().id("test-img").build())
+            .build();
+        assert_eq!(img.to_string(), r#"<img id="test-img">"#);
+    }
+
+    #[test]
+    fn test_nested_elements() {
+        let child = ElementBuilder::new(Tag::Span).content("child").build();
+
+        let parent = ElementBuilder::new(Tag::Div).children(vec![child]).build();
+
+        assert_eq!(parent.to_string(), "<div><span>child</span></div>");
+    }
+
+    #[test]
+    fn test_element_with_attributes() {
+        let element = ElementBuilder::new(Tag::Div)
+            .attrs(Attrs::new().id("test-id").class(vec!["test-class"]).build())
+            .build();
+
+        assert!(element.to_string().contains(r#"id="test-id""#));
+        assert!(element.to_string().contains(r#"class="test-class""#));
+    }
+
+    #[test]
+    fn test_comment_element() {
+        let comment = ElementBuilder::new(Tag::Comment)
+            .text("This is a comment")
+            .build();
+
+        assert_eq!(comment.to_string(), "<!-- This is a comment -->");
+    }
+
+    #[test]
+    fn test_element_with_content() {
+        let element = ElementBuilder::new(Tag::P).content("Hello, world!").build();
+
+        assert_eq!(element.to_string(), "<p>Hello, world!</p>");
+    }
+
+    #[test]
+    fn test_complex_nesting() {
+        let inner_span = ElementBuilder::new(Tag::Span).content("inner text").build();
+
+        let div = ElementBuilder::new(Tag::Div)
+            .attrs(Attrs::new().id("outer").class(vec!["test-class"]).build())
+            .children(vec![inner_span])
+            .build();
+
+        assert_eq!(
+            div.to_string(),
+            r#"<div class="test-class" id="outer"><span>inner text</span></div>"#
+        );
+    }
+}
