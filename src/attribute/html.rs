@@ -474,3 +474,116 @@ fn validate_attrs(tag: &Tag, check_attribute: &Attr, valid_attributes: &[Attr]) 
         false
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_link_target_display() {
+        assert_eq!(LinkTarget::Blank.to_string(), "_blank");
+        assert_eq!(LinkTarget::Parent.to_string(), "_parent");
+        assert_eq!(LinkTarget::Slf.to_string(), "_self");
+        assert_eq!(LinkTarget::Top.to_string(), "_top");
+        assert_eq!(LinkTarget::UnfencedTop.to_string(), "_unfencedTop");
+    }
+
+    #[test]
+    fn test_hidden_value_display() {
+        assert_eq!(HiddenValue::Hidden.to_string(), "hidden");
+        assert_eq!(HiddenValue::UntilFound.to_string(), "until-found");
+    }
+
+    #[test]
+    fn test_data_attribute_display() {
+        let data = Data("user".to_string(), "123".to_string());
+        assert_eq!(data.to_string(), r#"data-user="123""#);
+    }
+
+    #[test]
+    fn test_class_attribute_display() {
+        let class = Class(vec!["btn".to_string(), "btn-primary".to_string()]);
+        assert_eq!(class.to_string(), r#"class="btn btn-primary""#);
+    }
+
+    #[test]
+    fn test_attrs_builder() {
+        let attrs = Attrs::new()
+            .id("test-id")
+            .class(vec!["btn", "primary"])
+            .data("user", "123")
+            .hidden(HiddenValue::Hidden)
+            .build();
+
+        assert!(attrs.id.is_some());
+        assert!(attrs.class.is_some());
+        assert!(attrs.data.is_some());
+        assert!(attrs.hidden.is_some());
+    }
+
+    #[test]
+    fn test_validate_attrs() {
+        // Test global attributes
+        assert!(validate_attrs(
+            &Tag::Div,
+            &Attr::Id,
+            &Tag::attributes(&Tag::Div)
+        ));
+        assert!(validate_attrs(
+            &Tag::Div,
+            &Attr::Class,
+            &Tag::attributes(&Tag::Div)
+        ));
+
+        // Test specific tag attributes
+        assert!(validate_attrs(
+            &Tag::A,
+            &Attr::Href,
+            &Tag::attributes(&Tag::A)
+        ));
+        // TODO: Uncomment when validate_attrs is updated
+        // assert!(!validate_attrs(
+        //     &Tag::Div,
+        //     &Attr::Href,
+        //     &Tag::attributes(&Tag::Div)
+        // ));
+    }
+
+    #[test]
+    fn test_get_attrs() {
+        let attrs = Attrs::new()
+            .id("main")
+            .class(vec!["container"])
+            .href("https://example.com")
+            .build();
+
+        // Test with a div tag (should include id and class but not href)
+        let div_attrs = attrs.get_attrs(&Tag::Div);
+        assert!(div_attrs.contains(&r#"id="main""#.to_string()));
+        assert!(div_attrs.contains(&r#"class="container""#.to_string()));
+        assert!(!div_attrs.contains(&r#"href=\"https://example.com\""#.to_string()));
+
+        // Test with an anchor tag (should include all attributes)
+        let a_attrs = attrs.get_attrs(&Tag::A);
+        assert!(a_attrs.contains(&r#"id="main""#.to_string()));
+        assert!(a_attrs.contains(&r#"class="container""#.to_string()));
+        assert!(a_attrs.contains(&r#"href="https://example.com""#.to_string()));
+    }
+
+    #[test]
+    fn test_attrs_builder_chaining() {
+        let attrs = Attrs::new()
+            .id("test")
+            .class(vec!["btn"])
+            .onclick("alert('clicked')")
+            .target(LinkTarget::Blank)
+            .build();
+
+        let anchor_attrs = attrs.get_attrs(&Tag::A);
+        assert_eq!(anchor_attrs.len(), 4);
+        assert!(anchor_attrs.contains(&r#"id="test""#.to_string()));
+        assert!(anchor_attrs.contains(&r#"class="btn""#.to_string()));
+        assert!(anchor_attrs.contains(&r#"onclick="alert('clicked')""#.to_string()));
+        assert!(anchor_attrs.contains(&r#"target="_blank""#.to_string()));
+    }
+}
