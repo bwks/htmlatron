@@ -110,7 +110,7 @@ impl Tag {
             Tag::A => {
                 let mut attrs = Attr::global().to_vec();
                 attrs.extend_from_slice(&[
-                    //
+                    // A attributes
                     Attr::Href,
                     Attr::Onclick,
                     Attr::Rel,
@@ -121,8 +121,9 @@ impl Tag {
             Tag::Button => {
                 let mut attrs = Attr::global().to_vec();
                 attrs.extend_from_slice(&[
-                    //
+                    // Button attributes
                     Attr::Type,
+                    Attr::Onclick,
                 ]);
                 attrs
             }
