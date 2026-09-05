@@ -171,7 +171,7 @@ mod tests {
     #[test]
     fn test_button_tag_attributes() {
         let mut expected = Attr::global().to_vec();
-        expected.extend_from_slice(&[Attr::Type]);
+        expected.extend_from_slice(&[Attr::Type, Attr::Onclick]);
 
         assert_eq!(Tag::attributes(&Tag::Button), expected);
     }

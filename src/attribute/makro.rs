@@ -1,5 +1,3 @@
-use std::fmt::Display;
-
 use super::html::Attr;
 
 #[macro_export]
@@ -8,9 +6,14 @@ macro_rules! html_attribute {
         #[derive(Debug, Clone)]
         pub struct $name(pub String);
 
-        impl Display for $name {
-            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-                write!(f, r#"{}="{}""#, $attr, self.0)
+        impl ::std::fmt::Display for $name {
+            fn fmt(&self, f: &mut ::std::fmt::Formatter<'_>) -> ::std::fmt::Result {
+                write!(
+                    f,
+                    r#"{}="{}""#,
+                    $attr,
+                    $crate::attribute::EscapedAttributeValue(&self.0)
+                )
             }
         }
     };

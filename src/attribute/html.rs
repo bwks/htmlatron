@@ -1,5 +1,7 @@
 use std::fmt::Display;
 
+use super::EscapedAttributeValue;
+
 use log::warn;
 
 use crate::tag::Tag;
@@ -149,7 +151,13 @@ pub struct Data(pub String, pub String);
 
 impl Display for Data {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, r#"{}-{}="{}""#, Attr::Data, self.0, self.1)
+        write!(
+            f,
+            r#"{}-{}="{}""#,
+            Attr::Data,
+            self.0,
+            EscapedAttributeValue(&self.1)
+        )
     }
 }
 
@@ -171,7 +179,12 @@ impl Display for Class {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Class(values) => {
-                write!(f, r#"{}="{}""#, Attr::Class, values.join(" "))
+                write!(
+                    f,
+                    r#"{}="{}""#,
+                    Attr::Class,
+                    EscapedAttributeValue(&values.join(" "))
+                )
             }
         }
     }
@@ -583,7 +596,7 @@ mod tests {
         assert_eq!(anchor_attrs.len(), 4);
         assert!(anchor_attrs.contains(&r#"id="test""#.to_string()));
         assert!(anchor_attrs.contains(&r#"class="btn""#.to_string()));
-        assert!(anchor_attrs.contains(&r#"onclick="alert('clicked')""#.to_string()));
+        assert!(anchor_attrs.contains(&r#"onclick="alert(&#39;clicked&#39;)""#.to_string()));
         assert!(anchor_attrs.contains(&r#"target="_blank""#.to_string()));
     }
 }
