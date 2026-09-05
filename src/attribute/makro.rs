@@ -24,6 +24,7 @@ html_attribute!(Az => Attr::Az);
 html_attribute!(Alt => Attr::Alt);
 html_attribute!(Charset => Attr::Charset);
 html_attribute!(Content => Attr::Content);
+html_attribute!(Crossorigin => Attr::Crossorigin);
 html_attribute!(Height => Attr::Height);
 html_attribute!(Hidden => Attr::Hidden);
 html_attribute!(Href => Attr::Href);

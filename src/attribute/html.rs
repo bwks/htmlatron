@@ -7,8 +7,8 @@ use log::warn;
 use crate::tag::Tag;
 
 use super::{
-    Alt, Az, Charset, Content, Height, Hidden, Href, HttpEquiv, Id, Lang, Name, Onclick, Rel, Src,
-    Tabindex, Target, Type, Width,
+    Alt, Az, Charset, Content, Crossorigin, Height, Hidden, Href, HttpEquiv, Id, Lang, Name,
+    Onclick, Rel, Src, Tabindex, Target, Type, Width,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -61,6 +61,7 @@ pub enum Attr {
     Az,
     Charset,
     Content,
+    Crossorigin,
     Class,
     Data,
     Defer,
@@ -86,6 +87,7 @@ impl Display for Attr {
             Attr::Az => write!(f, "as"),
             Attr::Charset => write!(f, "charset"),
             Attr::Content => write!(f, "content"),
+            Attr::Crossorigin => write!(f, "crossorigin"),
             Attr::Class => write!(f, "class"),
             Attr::Data => write!(f, "data"),
             Attr::Defer => write!(f, "defer"),
@@ -115,6 +117,7 @@ impl Attr {
             Attr::Class,
             Attr::Charset,
             Attr::Content,
+            Attr::Crossorigin,
             Attr::Data,
             Attr::Defer,
             Attr::Height,
@@ -199,6 +202,7 @@ pub struct Attrs {
     pub class: Option<Class>,
     pub charset: Option<Charset>,
     pub content: Option<Content>,
+    pub crossorigin: Option<Crossorigin>,
     pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub height: Option<Height>,
@@ -238,6 +242,9 @@ impl Attrs {
         }
         if self.content.is_some() && validate_attrs(tag, &Attr::Content, &tag_attributes) {
             attributes.push(self.content.as_ref().unwrap().to_string())
+        }
+        if self.crossorigin.is_some() && validate_attrs(tag, &Attr::Crossorigin, &tag_attributes) {
+            attributes.push(self.crossorigin.as_ref().unwrap().to_string())
         }
         if self.data.is_some() && validate_attrs(tag, &Attr::Data, &tag_attributes) {
             attributes.push(self.data.as_ref().unwrap().to_string())
@@ -297,6 +304,7 @@ pub struct AttrsBuilder {
     pub charset: Option<Charset>,
     pub class: Option<Class>,
     pub content: Option<Content>,
+    pub crossorigin: Option<Crossorigin>,
     pub data: Option<Data>,
     pub defer: Option<Defer>,
     pub height: Option<Height>,
@@ -327,6 +335,7 @@ impl AttrsBuilder {
             charset: None,
             class: None,
             content: None,
+            crossorigin: None,
             data: None,
             defer: None,
             height: None,
@@ -362,6 +371,11 @@ impl AttrsBuilder {
 
     pub fn content(mut self, content: impl Into<String>) -> Self {
         self.content = Some(Content(content.into()));
+        self
+    }
+
+    pub fn crossorigin(mut self, crossorigin: impl Into<String>) -> Self {
+        self.crossorigin = Some(Crossorigin(crossorigin.into()));
         self
     }
 
@@ -458,6 +472,7 @@ impl AttrsBuilder {
             charset: self.charset,
             class: self.class,
             content: self.content,
+            crossorigin: self.crossorigin,
             data: self.data,
             defer: self.defer,
             height: self.height,
