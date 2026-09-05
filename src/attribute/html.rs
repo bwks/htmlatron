@@ -8,7 +8,7 @@ use crate::tag::Tag;
 
 use super::{
     Alt, Az, Charset, Content, Crossorigin, Height, Hidden, Href, HttpEquiv, Id, Lang, Name,
-    Onclick, Rel, Src, Tabindex, Target, Type, Width,
+    Onclick, Rel, Src, Style, Tabindex, Target, Type, Width,
 };
 
 #[derive(Debug, Clone, PartialEq)]
@@ -74,6 +74,7 @@ pub enum Attr {
     Name,
     Onclick,
     Src,
+    Style,
     Tabindex,
     Target,
     Type,
@@ -100,6 +101,7 @@ impl Display for Attr {
             Attr::Name => write!(f, "name"),
             Attr::Onclick => write!(f, "onclick"),
             Attr::Src => write!(f, "src"),
+            Attr::Style => write!(f, "style"),
             Attr::Tabindex => write!(f, "tabindex"),
             Attr::Target => write!(f, "target"),
             Attr::Type => write!(f, "type"),
@@ -129,6 +131,7 @@ impl Attr {
             Attr::Onclick,
             Attr::Rel,
             Attr::Src,
+            Attr::Style,
             Attr::Tabindex,
             Attr::Target,
             Attr::Type,
@@ -140,6 +143,7 @@ impl Attr {
             //
             Attr::Id,
             Attr::Class,
+            Attr::Style,
             Attr::Data,
             Attr::Hidden,
             Attr::Lang,
@@ -214,6 +218,7 @@ pub struct Attrs {
     pub onclick: Option<Onclick>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
+    pub style: Option<Style>,
     pub tabindex: Option<Tabindex>,
     pub target: Option<Target>,
     pub typ: Option<Type>,
@@ -279,6 +284,9 @@ impl Attrs {
         if self.src.is_some() && validate_attrs(tag, &Attr::Src, &tag_attributes) {
             attributes.push(self.src.as_ref().unwrap().to_string())
         }
+        if self.style.is_some() && validate_attrs(tag, &Attr::Style, &tag_attributes) {
+            attributes.push(self.style.as_ref().unwrap().to_string())
+        }
         if self.tabindex.is_some() && validate_attrs(tag, &Attr::Tabindex, &tag_attributes) {
             attributes.push(self.tabindex.as_ref().unwrap().to_string())
         }
@@ -317,6 +325,7 @@ pub struct AttrsBuilder {
     pub onclick: Option<Onclick>,
     pub rel: Option<Rel>,
     pub src: Option<Src>,
+    pub style: Option<Style>,
     pub target: Option<Target>,
     pub tabindex: Option<Tabindex>,
     pub typ: Option<Type>,
@@ -348,6 +357,7 @@ impl AttrsBuilder {
             onclick: None,
             rel: None,
             src: None,
+            style: None,
             tabindex: None,
             target: None,
             typ: None,
@@ -460,6 +470,11 @@ impl AttrsBuilder {
         self
     }
 
+    pub fn style(mut self, style: impl Into<String>) -> Self {
+        self.style = Some(Style(style.into()));
+        self
+    }
+
     pub fn width(mut self, width: impl Into<String>) -> Self {
         self.width = Some(Width(width.into()));
         self
@@ -485,6 +500,7 @@ impl AttrsBuilder {
             onclick: self.onclick,
             rel: self.rel,
             src: self.src,
+            style: self.style,
             tabindex: self.tabindex,
             target: self.target,
             typ: self.typ,

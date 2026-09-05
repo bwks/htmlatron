@@ -35,6 +35,7 @@ html_attribute!(Name => Attr::Name);
 html_attribute!(Onclick => Attr::Onclick);
 html_attribute!(Rel => Attr::Rel);
 html_attribute!(Src => Attr::Src);
+html_attribute!(Style => Attr::Style);
 html_attribute!(Tabindex => Attr::Tabindex);
 html_attribute!(Target => Attr::Target);
 html_attribute!(Type => Attr::Type);
